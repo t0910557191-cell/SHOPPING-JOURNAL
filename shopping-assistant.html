@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>採購手帳</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Noto+Serif+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf8f4;
+    --gold: #b8965a;
+    --gold-light: #d4b07a;
+    --gold-pale: #e8d5b0;
+    --dark: #2a2218;
+    --mid: #5a4e3c;
+    --light: #8a7d68;
+    --divider: #ddd5c0;
+    --status-buy: #7a9e7e;
+    --status-bought: #4a7a8a;
+    --status-pass: #b07a7a;
+    --status-catalog: #9a7aaa;
+    --accent: #c4956a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--cream);
+    color: var(--dark);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: var(--dark);
+    color: var(--gold-pale);
+    padding: 16px 20px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 4px;
+    color: var(--gold-light);
+  }
+  .header-sub {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--light);
+    margin-top: 2px;
+  }
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-icon {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(184,150,90,0.3);
+    color: var(--gold-light);
+    padding: 6px 12px;
+    border-radius: 2px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    transition: all 0.2s;
+  }
+  .btn-icon:hover { background: rgba(184,150,90,0.2); }
+
+  /* ── Tab nav ── */
+  .tab-nav {
+    background: var(--dark);
+    border-bottom: 1px solid rgba(184,150,90,0.2);
+    display: flex;
+    padding: 0 20px;
+    gap: 0;
+  }
+  .tab {
+    padding: 10px 18px;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    color: var(--light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab.active {
+    color: var(--gold-light);
+    border-bottom-color: var(--gold);
+  }
+
+  /* ── Main content ── */
+  .page { display: none; padding: 0 0 80px; }
+  .page.active { display: block; }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(184,150,90,0.4);
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 90;
+  }
+  .fab:hover { transform: scale(1.05); box-shadow: 0 6px 24px rgba(184,150,90,0.5); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30,24,16,0.7);
+    z-index: 200;
+    display: none;
+    align-items: flex-end;
+    backdrop-filter: blur(3px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--warm-white);
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 12px 12px 0 0;
+    overflow-y: auto;
+    padding: 20px 20px 40px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(60px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    color: var(--dark);
+    letter-spacing: 2px;
+  }
+  .modal-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    color: var(--light);
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+
+  /* ── Form ── */
+  .form-section {
+    margin-bottom: 18px;
+  }
+  .form-label {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    color: var(--light);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    background: var(--cream);
+    border: 1px solid var(--divider);
+    border-radius: 3px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: var(--dark);
+    font-family: 'Noto Serif TC', serif;
+    font-weight: 300;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--gold);
+  }
+  .form-textarea { resize: vertical; min-height: 60px; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* Price row with TWD hint */
+  .price-wrap { position: relative; }
+  .price-hint {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--gold);
+    pointer-events: none;
+    font-style: italic;
+  }
+
+  /* Toggle buttons */
+  .toggle-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .toggle-btn {
+    padding: 7px 14px;
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    font-size: 12px;
+    font-family: 'Noto Serif TC', serif;
+    background: transparent;
+    color: var(--mid);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 1px;
+  }
+  .toggle-btn.active {
+    background: var(--dark);
+    border-color: var(--dark);
+    color: var(--gold-pale);
+  }
+
+  /* Photo area */
+  .photo-area {
+    border: 1.5px dashed var(--divider);
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-area:hover { border-color: var(--gold); }
+  .photo-area input[type=file] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .photo-preview {
+    width: 100%;
+    max-height: 160px;
+    object-fit: contain;
+    border-radius: 2px;
+  }
+  .photo-placeholder {
+    color: var(--light);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+  }
+  .photo-icon { font-size: 28px; margin-bottom: 6px; }
+
+  /* Discount section */
+  .discount-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .discount-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .discount-toggle input { display: none; }
+  .discount-dot {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--divider);
+    border-radius: 50%;
+    background: transparent;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .discount-toggle input:checked ~ .discount-dot {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+  .discount-label { font-size: 12px; color: var(--mid); letter-spacing: 1px; }
+
+  /* Save button */
+  .btn-save {
+    width: 100%;
+    background: var(--dark);
+    color: var(--gold-pale);
+    border: none;
+    padding: 14px;
+    font-size: 12px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    border-radius: 3px;
+    transition: background 0.2s;
+    margin-top: 6px;
+  }
+  .btn-save:hover { background: #3d3020; }
+
+  /* ── Records ── */
+  .filter-bar {
+    padding: 12px 16px;
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--divider);
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .filter-bar::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    padding: 5px 12px;
+    border: 1px solid var(--divider);
+    border-radius: 20px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+    background: transparent;
+    color: var(--mid);
+    font-family: 'Noto Serif TC', serif;
+  }
+  .filter-chip.active {
+    background: var(--dark);
+    border-color: var(--dark);
+    color: var(--gold-pale);
+  }
+
+  .record-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+  .record-card {
+    background: var(--warm-white);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+  .record-card:hover { box-shadow: 0 2px 12px rgba(42,34,24,0.1); }
+
+  .record-top {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+  }
+  .record-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: var(--divider);
+  }
+  .record-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; }
+
+  .record-body { flex: 1; min-width: 0; }
+  .record-name {
+    font-size: 14px;
+    color: var(--dark);
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .record-meta {
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .record-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--dark);
+  }
+  .record-price-twd {
+    font-size: 11px;
+    color: var(--gold);
+    margin-left: 4px;
+  }
+
+  .record-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    padding: 0 12px 10px;
+  }
+  .tag {
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+  .tag-cat { background: var(--cream); color: var(--mid); border: 1px solid var(--divider); }
+  .tag-biz { background: #e8ede8; color: #4a6a4a; }
+  .tag-personal { background: #ede8ec; color: #6a4a68; }
+  .tag-discount { background: #fdf3e3; color: var(--accent); border: 1px solid var(--gold-pale); }
+  .tag-catalog { background: #f0edf5; color: var(--status-catalog); }
+
+  .record-bottom {
+    border-top: 1px solid var(--divider);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .status-btns { display: flex; gap: 4px; }
+  .status-btn {
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    border: 1px solid var(--divider);
+    background: transparent;
+    color: var(--light);
+    font-family: 'Noto Serif TC', serif;
+    transition: all 0.15s;
+  }
+  .status-btn.s-buy.active { background: var(--status-buy); border-color: var(--status-buy); color: white; }
+  .status-btn.s-bought.active { background: var(--status-bought); border-color: var(--status-bought); color: white; }
+  .status-btn.s-pass.active { background: var(--status-pass); border-color: var(--status-pass); color: white; }
+  .status-btn.s-catalog.active { background: var(--status-catalog); border-color: var(--status-catalog); color: white; }
+
+  .card-status-row {
+    display: flex;
+    gap: 5px;
+    margin-top: 7px;
+  }
+
+  .record-action-btns { display: flex; gap: 6px; }
+  .rec-btn {
+    background: none;
+    border: 1px solid var(--divider);
+    color: var(--light);
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    transition: all 0.15s;
+  }
+  .rec-btn:hover { border-color: var(--gold); color: var(--gold); }
+  .rec-btn.danger:hover { border-color: var(--status-pass); color: var(--status-pass); }
+
+  /* ── Summary page ── */
+  .summary-section { padding: 16px; }
+  .summary-card {
+    background: var(--warm-white);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .summary-card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 3px;
+    color: var(--mid);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    font-size: 13px;
+    border-bottom: 1px dotted var(--divider);
+  }
+  .summary-row:last-child { border: none; }
+  .summary-amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: var(--dark);
+  }
+
+  /* ── Settings page ── */
+  .settings-section { padding: 16px; }
+  .settings-group {
+    background: var(--warm-white);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .settings-group-title {
+    padding: 12px 16px;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--light);
+    background: var(--cream);
+    border-bottom: 1px solid var(--divider);
+  }
+  .settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--divider);
+  }
+  .settings-row:last-child { border: none; }
+  .settings-row-label { font-size: 13px; color: var(--dark); }
+  .settings-input-sm {
+    background: var(--cream);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    padding: 6px 10px;
+    font-size: 14px;
+    color: var(--dark);
+    font-family: 'Noto Serif TC', serif;
+    width: 90px;
+    text-align: right;
+  }
+  .settings-input-sm:focus { outline: none; border-color: var(--gold); }
+
+  .btn-export {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 12px;
+    font-size: 11px;
+    letter-spacing: 3px;
+    cursor: pointer;
+    font-family: 'Noto Serif TC', serif;
+    border-radius: 3px;
+    transition: all 0.2s;
+    margin-bottom: 8px;
+  }
+  .btn-export:hover { background: var(--gold); color: white; }
+
+  /* Batch currency modal */
+  .batch-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--divider);
+    font-size: 13px;
+  }
+  .batch-item:last-child { border: none; }
+
+  /* empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--light);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.4; }
+  .empty-text { font-size: 13px; letter-spacing: 2px; }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--dark);
+    color: var(--gold-pale);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 300;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Scroll area for catalog to purchase */
+  .catalog-convert-btn {
+    font-size: 10px;
+    padding: 3px 8px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <div class="header-title">採購手帳</div>
+    <div class="header-sub">SHOPPING JOURNAL</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-icon" onclick="openBatchModal()">批次</button>
+    <button class="btn-icon" onclick="openBatchCurrencyModal()">幣別</button>
+  </div>
+</div>
+
+<!-- Tab nav -->
+<div class="tab-nav">
+  <div class="tab active" onclick="switchTab('records')">紀錄</div>
+  <div class="tab" onclick="switchTab('catalog')">目錄</div>
+  <div class="tab" onclick="switchTab('summary')">統計</div>
+  <div class="tab" onclick="switchTab('settings')">設定</div>
+</div>
+
+<!-- Records page -->
+<div id="page-records" class="page active">
+  <div class="filter-bar">
+    <button class="filter-chip active" onclick="setFilter('all', this)">全部</button>
+    <button class="filter-chip" onclick="setFilter('buy', this)">要買</button>
+    <button class="filter-chip" onclick="setFilter('bought', this)">已買</button>
+    <button class="filter-chip" onclick="setFilter('pass', this)">放棄</button>
+    <button class="filter-chip" onclick="setFilter('biz', this)">業務</button>
+    <button class="filter-chip" onclick="setFilter('personal', this)">私人</button>
+  </div>
+  <div id="record-list" class="record-list">
+    <div class="empty-state">
+      <div class="empty-icon">✦</div>
+      <div class="empty-text">點擊 + 開始記錄</div>
+    </div>
+  </div>
+</div>
+
+<!-- Catalog page -->
+<div id="page-catalog" class="page">
+  <div id="catalog-list" class="record-list">
+    <div class="empty-state">
+      <div class="empty-icon">◇</div>
+      <div class="empty-text">詢價商品暫存於此</div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary page -->
+<div id="page-summary" class="page">
+  <div class="summary-section" id="summary-content"></div>
+</div>
+
+<!-- Settings page -->
+<div id="page-settings" class="page">
+  <div class="settings-section">
+    <div class="settings-group">
+      <div class="settings-group-title">匯率設定（對台幣）</div>
+      <div class="settings-row">
+        <span class="settings-row-label">EUR → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-EUR" value="35" onchange="saveRates()">
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">RMB → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-RMB" value="4.5" onchange="saveRates()">
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">TWD → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-TWD" value="1" readonly style="opacity:0.5">
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-group-title">資料匯出</div>
+      <div style="padding:14px">
+        <button class="btn-export" onclick="exportCSV('all')">匯出全部紀錄 CSV</button>
+        <button class="btn-export" onclick="exportCSV('biz')">匯出業務紀錄 CSV</button>
+        <button class="btn-export" onclick="exportCSV('personal')">匯出私人紀錄 CSV</button>
+      </div>
+    </div>
+    <div class="settings-group">
+      <div class="settings-group-title">資料管理</div>
+      <div style="padding:14px">
+        <button class="btn-export" style="border-color:var(--status-pass);color:var(--status-pass)" onclick="clearAll()">清除全部資料</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddModal()">＋</button>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title-text">新增紀錄</div>
+      <button class="modal-close" onclick="closeModal('add-modal')">✕</button>
+    </div>
+
+    <!-- Photo -->
+    <div class="form-section">
+      <div class="photo-area" id="photo-area" onclick="document.getElementById('photo-input').click()">
+        <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)">
+        <div id="photo-placeholder" class="photo-placeholder">
+          <div class="photo-icon">📷</div>
+          <div>拍照或選擇圖片</div>
+        </div>
+        <img id="photo-preview" class="photo-preview" style="display:none">
+      </div>
+    </div>
+
+    <!-- Name -->
+    <div class="form-section">
+      <label class="form-label">商品名稱</label>
+      <input type="text" class="form-input" id="f-name" placeholder="選填">
+    </div>
+
+    <!-- Price + currency -->
+    <div class="form-section">
+      <label class="form-label">價格 / 幣別</label>
+      <div class="form-row">
+        <div class="price-wrap">
+          <input type="number" class="form-input" id="f-price" placeholder="選填" oninput="updateTwdHint()">
+          <span class="price-hint" id="twd-hint"></span>
+        </div>
+        <select class="form-select" id="f-currency" onchange="updateTwdHint()">
+          <option value="">幣別</option>
+          <option value="EUR">EUR</option>
+          <option value="RMB">RMB</option>
+          <option value="TWD">TWD</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- City + Store -->
+    <div class="form-section">
+      <label class="form-label">城市 / 店名</label>
+      <div class="form-row">
+        <input type="text" class="form-input" id="f-city" placeholder="城市（選填）">
+        <input type="text" class="form-input" id="f-store" placeholder="店名（選填）">
+      </div>
+    </div>
+
+    <!-- Discount -->
+    <div class="form-section">
+      <label class="form-label">折扣</label>
+      <label class="discount-toggle">
+        <input type="checkbox" id="f-has-discount" onchange="toggleDiscount()">
+        <span class="discount-dot"></span>
+        <span class="discount-label">有折扣 / 現金價</span>
+      </label>
+      <div id="discount-fields" style="display:none;margin-top:10px">
+        <div class="form-row">
+          <div class="price-wrap">
+            <input type="number" class="form-input" id="f-discount-price" placeholder="折後價" oninput="updateDiscountHint()">
+            <span class="price-hint" id="discount-hint"></span>
+          </div>
+          <input type="text" class="form-input" id="f-discount-note" placeholder="折扣備註">
+        </div>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="form-section">
+      <label class="form-label">分類</label>
+      <div class="toggle-group" id="cat-group">
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">皮件</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">飾品</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">服飾</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">娃娃</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">化妝品</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">精品</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">歐根紗袋</button>
+        <button class="toggle-btn" onclick="selectToggle('cat-group', this, 'f-category')">其他</button>
+      </div>
+      <input type="hidden" id="f-category">
+    </div>
+
+    <!-- Type -->
+    <div class="form-section">
+      <label class="form-label">用途</label>
+      <div class="toggle-group" id="type-group">
+        <button class="toggle-btn" onclick="selectToggle('type-group', this, 'f-type')">業務</button>
+        <button class="toggle-btn" onclick="selectToggle('type-group', this, 'f-type')">私人</button>
+      </div>
+      <input type="hidden" id="f-type">
+    </div>
+
+    <!-- Mode: catalog or record -->
+    <div class="form-section">
+      <label class="form-label">記錄模式</label>
+      <div class="toggle-group" id="mode-group">
+        <button class="toggle-btn active" onclick="selectToggle('mode-group', this, 'f-mode')">採購紀錄</button>
+        <button class="toggle-btn" onclick="selectToggle('mode-group', this, 'f-mode')">暫存目錄</button>
+      </div>
+      <input type="hidden" id="f-mode" value="採購紀錄">
+    </div>
+
+    <!-- Note -->
+    <div class="form-section">
+      <label class="form-label">備註</label>
+      <textarea class="form-textarea" id="f-note" placeholder="評價或備注..."></textarea>
+    </div>
+
+    <input type="hidden" id="f-edit-id">
+    <button class="btn-save" onclick="saveRecord()">儲 存</button>
+  </div>
+</div>
+
+<!-- Batch currency modal -->
+<div class="modal-overlay" id="batch-currency-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">批次修改幣別</div>
+      <button class="modal-close" onclick="closeModal('batch-currency-modal')">✕</button>
+    </div>
+    <p style="font-size:12px;color:var(--light);letter-spacing:1.5px;margin-bottom:14px">選擇未填幣別的紀錄，統一設定</p>
+    <div id="batch-list"></div>
+    <div style="margin-top:14px">
+      <label class="form-label">套用幣別</label>
+      <select class="form-select" id="batch-currency">
+        <option value="EUR">EUR</option>
+        <option value="RMB">RMB</option>
+        <option value="TWD">TWD</option>
+      </select>
+    </div>
+    <button class="btn-save" style="margin-top:14px" onclick="applyBatchCurrency()">套 用 選 取</button>
+  </div>
+</div>
+
+<!-- Batch status modal -->
+<div class="modal-overlay" id="batch-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">今日標記</div>
+      <button class="modal-close" onclick="closeModal('batch-modal')">✕</button>
+    </div>
+    <div id="batch-status-list"></div>
+    <button class="btn-save" style="margin-top:14px" onclick="saveBatchStatus()">儲 存</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── IndexedDB setup ──
+const DB_NAME = 'shopping-journal';
+const DB_VERSION = 1;
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('records')) {
+        d.createObjectStore('records', { keyPath: 'id' });
+      }
+      if (!d.objectStoreNames.contains('photos')) {
+        d.createObjectStore('photos', { keyPath: 'id' });
+      }
+      if (!d.objectStoreNames.contains('settings')) {
+        d.createObjectStore('settings', { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; resolve(db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(store, value) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(value);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGet(store, key) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbDelete(store, key) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(key);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbClear(store) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).clear();
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ── App state ──
+let records = [];
+let rates = { EUR: 35, RMB: 4.5, TWD: 1 };
+let currentFilter = 'all';
+let photoData = null; // current editing photo (blob URL or base64)
+let photoBlob = null; // raw blob for saving to IndexedDB
+let batchSelections = {};
+
+async function saveData() {
+  // Save all records (without photo) to IndexedDB records store
+  for (const r of records) {
+    const recNoPhoto = { ...r };
+    delete recNoPhoto.photo; // don't store photo in records store
+    await dbPut('records', recNoPhoto);
+  }
+}
+
+async function saveRecord_db(rec, blob) {
+  const recNoPhoto = { ...rec };
+  delete recNoPhoto.photo;
+  await dbPut('records', recNoPhoto);
+  if (blob) {
+    await dbPut('photos', { id: rec.id, blob });
+  }
+}
+
+async function deleteRecord_db(id) {
+  await dbDelete('records', id);
+  await dbDelete('photos', id);
+}
+
+async function loadAllRecords() {
+  const recs = await dbGetAll('records');
+  const photos = await dbGetAll('photos');
+  const photoMap = {};
+  photos.forEach(p => {
+    photoMap[p.id] = URL.createObjectURL(p.blob);
+  });
+  records = recs.map(r => ({ ...r, photo: photoMap[r.id] || null }));
+  // sort newest first
+  records.sort((a, b) => (b.id > a.id ? 1 : -1));
+}
+
+async function saveRates() {
+  rates.EUR = parseFloat(document.getElementById('rate-EUR').value) || 35;
+  rates.RMB = parseFloat(document.getElementById('rate-RMB').value) || 4.5;
+  rates.TWD = 1;
+  await dbPut('settings', { key: 'rates', value: rates });
+  renderRecords();
+  toast('匯率已更新');
+}
+
+async function loadRates() {
+  const stored = await dbGet('settings', 'rates');
+  if (stored) rates = stored.value;
+  document.getElementById('rate-EUR').value = rates.EUR;
+  document.getElementById('rate-RMB').value = rates.RMB;
+}
+
+function loadRateInputs() {
+  document.getElementById('rate-EUR').value = rates.EUR;
+  document.getElementById('rate-RMB').value = rates.RMB;
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const tabs = ['records','catalog','summary','settings'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'summary') renderSummary();
+  if (tab === 'catalog') renderCatalog();
+  if (tab === 'records') renderRecords();
+}
+
+function openAddModal(editId = null) {
+  clearForm();
+  if (editId) {
+    const rec = records.find(r => r.id === editId);
+    if (!rec) return;
+    document.getElementById('modal-title-text').textContent = '編輯紀錄';
+    document.getElementById('f-edit-id').value = editId;
+    document.getElementById('f-name').value = rec.name || '';
+    document.getElementById('f-price').value = rec.price || '';
+    document.getElementById('f-currency').value = rec.currency || '';
+    document.getElementById('f-city').value = rec.city || '';
+    document.getElementById('f-store').value = rec.store || '';
+    document.getElementById('f-category').value = rec.category || '';
+    document.getElementById('f-type').value = rec.type || '';
+    document.getElementById('f-mode').value = rec.mode || '採購紀錄';
+    document.getElementById('f-note').value = rec.note || '';
+    if (rec.hasDiscount) {
+      document.getElementById('f-has-discount').checked = true;
+      document.getElementById('discount-fields').style.display = 'block';
+      document.getElementById('f-discount-price').value = rec.discountPrice || '';
+      document.getElementById('f-discount-note').value = rec.discountNote || '';
+    }
+    if (rec.photo) {
+      document.getElementById('photo-preview').src = rec.photo;
+      document.getElementById('photo-preview').style.display = 'block';
+      document.getElementById('photo-placeholder').style.display = 'none';
+      photoData = rec.photo;
+      photoBlob = null; // already saved, no new blob
+    }
+    restoreToggle('cat-group', rec.category);
+    restoreToggle('type-group', rec.type);
+    restoreToggle('mode-group', rec.mode);
+    updateTwdHint();
+  } else {
+    document.getElementById('modal-title-text').textContent = '新增紀錄';
+    document.querySelector('#mode-group .toggle-btn').classList.add('active');
+    document.getElementById('f-mode').value = '採購紀錄';
+  }
+  document.getElementById('add-modal').classList.add('open');
+}
+
+function restoreToggle(groupId, value) {
+  if (!value) return;
+  const btns = document.querySelectorAll('#' + groupId + ' .toggle-btn');
+  btns.forEach(b => {
+    b.classList.toggle('active', b.textContent === value);
+  });
+}
+
+function clearForm() {
+  ['f-name','f-price','f-currency','f-city','f-store','f-category','f-type','f-note','f-edit-id','f-discount-price','f-discount-note'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('f-mode').value = '採購紀錄';
+  document.getElementById('f-has-discount').checked = false;
+  document.getElementById('discount-fields').style.display = 'none';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-placeholder').style.display = 'block';
+  document.getElementById('twd-hint').textContent = '';
+  document.getElementById('discount-hint').textContent = '';
+  photoData = null;
+  photoBlob = null;
+  document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function handlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  photoBlob = file; // save raw blob for IndexedDB
+  const url = URL.createObjectURL(file);
+  photoData = url;
+  document.getElementById('photo-preview').src = url;
+  document.getElementById('photo-preview').style.display = 'block';
+  document.getElementById('photo-placeholder').style.display = 'none';
+}
+
+function selectToggle(groupId, btn, hiddenId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(hiddenId).value = btn.textContent;
+}
+
+function toggleDiscount() {
+  const checked = document.getElementById('f-has-discount').checked;
+  document.getElementById('discount-fields').style.display = checked ? 'block' : 'none';
+}
+
+function toTWD(price, currency) {
+  if (!price || !currency || !rates[currency]) return null;
+  return Math.round(parseFloat(price) * rates[currency]);
+}
+
+function updateTwdHint() {
+  const price = document.getElementById('f-price').value;
+  const cur = document.getElementById('f-currency').value;
+  const twd = toTWD(price, cur);
+  document.getElementById('twd-hint').textContent = twd && cur !== 'TWD' ? `≈${twd}` : '';
+}
+
+function updateDiscountHint() {
+  const price = document.getElementById('f-discount-price').value;
+  const cur = document.getElementById('f-currency').value;
+  const twd = toTWD(price, cur);
+  document.getElementById('discount-hint').textContent = twd && cur !== 'TWD' ? `≈${twd}` : '';
+}
+
+async function saveRecord() {
+  const editId = document.getElementById('f-edit-id').value;
+  const mode = document.getElementById('f-mode').value || '採購紀錄';
+  const id = editId || Date.now().toString();
+  const existingRec = editId ? records.find(r => r.id === editId) : null;
+
+  const rec = {
+    id,
+    name: document.getElementById('f-name').value,
+    price: document.getElementById('f-price').value,
+    currency: document.getElementById('f-currency').value,
+    city: document.getElementById('f-city').value,
+    store: document.getElementById('f-store').value,
+    category: document.getElementById('f-category').value,
+    type: document.getElementById('f-type').value,
+    mode,
+    note: document.getElementById('f-note').value,
+    hasDiscount: document.getElementById('f-has-discount').checked,
+    discountPrice: document.getElementById('f-discount-price').value,
+    discountNote: document.getElementById('f-discount-note').value,
+    photo: photoData || (existingRec ? existingRec.photo : null),
+    status: existingRec ? (existingRec.status || '') : '',
+    date: existingRec ? (existingRec.date || new Date().toLocaleDateString('zh-TW')) : new Date().toLocaleDateString('zh-TW'),
+  };
+
+  // Save to IndexedDB
+  await saveRecord_db(rec, photoBlob);
+
+  if (editId) {
+    const idx = records.findIndex(r => r.id === editId);
+    records[idx] = rec;
+  } else {
+    records.unshift(rec);
+  }
+
+  closeModal('add-modal');
+  renderRecords();
+  renderCatalog();
+  toast('已儲存');
+}
+
+function renderRecords() {
+  const list = document.getElementById('record-list');
+  let filtered = records.filter(r => r.mode !== '暫存目錄');
+  if (currentFilter === 'buy') filtered = filtered.filter(r => r.status === 'buy');
+  else if (currentFilter === 'bought') filtered = filtered.filter(r => r.status === 'bought');
+  else if (currentFilter === 'pass') filtered = filtered.filter(r => r.status === 'pass');
+  else if (currentFilter === 'biz') filtered = filtered.filter(r => r.type === '業務');
+  else if (currentFilter === 'personal') filtered = filtered.filter(r => r.type === '私人');
+
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">暫無紀錄</div></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(r => recordCardHTML(r)).join('');
+}
+
+function renderCatalog() {
+  const list = document.getElementById('catalog-list');
+  const items = records.filter(r => r.mode === '暫存目錄');
+  if (!items.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">◇</div><div class="empty-text">詢價商品暫存於此</div></div>`;
+    return;
+  }
+  list.innerHTML = items.map(r => recordCardHTML(r, true)).join('');
+}
+
+function recordCardHTML(r, isCatalog = false) {
+  const twd = toTWD(r.price, r.currency);
+  const twdStr = twd && r.currency !== 'TWD' ? `<span class="record-price-twd">≈ TWD ${twd.toLocaleString()}</span>` : '';
+  const priceStr = r.price ? `${r.price}${r.currency ? ' ' + r.currency : ''}` : '—';
+  const thumb = r.photo
+    ? `<div class="record-thumb"><img src="${r.photo}"></div>`
+    : `<div class="record-thumb">◻</div>`;
+
+
+
+  const inlineStatus = !isCatalog ? `
+    <div class="card-status-row">
+      <button class="status-btn s-buy ${r.status==='buy'?'active':''}" onclick="setStatus('${r.id}','buy',this)">要買</button>
+      <button class="status-btn s-bought ${r.status==='bought'?'active':''}" onclick="setStatus('${r.id}','bought',this)">已買</button>
+      <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="setStatus('${r.id}','pass',this)">放棄</button>
+    </div>` : '';
+
+  return `<div class="record-card" id="card-${r.id}">
+    <div class="record-top">
+      ${thumb}
+      <div class="record-body">
+        <div class="record-name">${r.name || '（未命名）'}</div>
+        <div class="record-meta">${[r.city, r.store].filter(Boolean).join(' · ') || ''} ${r.date ? '· ' + r.date : ''}</div>
+        <div class="record-price">${priceStr}${twdStr}</div>
+        ${inlineStatus}
+      </div>
+    </div>
+    <div class="record-tags">
+      ${r.category ? `<span class="tag tag-cat">${r.category}</span>` : ''}
+      ${r.type === '業務' ? `<span class="tag tag-biz">業務</span>` : r.type === '私人' ? `<span class="tag tag-personal">私人</span>` : ''}
+      ${r.hasDiscount ? `<span class="tag tag-discount">折扣${r.discountPrice ? ' ' + r.discountPrice : ''}</span>` : ''}
+      ${isCatalog ? `<span class="tag tag-catalog">目錄</span>` : ''}
+    </div>
+    <div class="record-bottom">
+      ${isCatalog ? `
+        <button class="rec-btn catalog-convert-btn" onclick="convertCatalog('${r.id}')">→ 採購</button>
+        <button class="rec-btn danger" onclick="deleteRecord('${r.id}')">刪</button>` : ''}
+      <div class="record-action-btns" style="${isCatalog?'':'margin-left:auto'}">
+        <button class="rec-btn" onclick="openAddModal('${r.id}')">編輯</button>
+        ${!isCatalog ? `<button class="rec-btn danger" onclick="deleteRecord('${r.id}')">刪</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function setStatus(id, status, btn) {
+  const rec = records.find(r => r.id === id);
+  if (!rec) return;
+  rec.status = rec.status === status ? '' : status;
+  const recNoPhoto = { ...rec }; delete recNoPhoto.photo;
+  await dbPut('records', recNoPhoto);
+  const card = document.getElementById('card-' + id);
+  if (card) {
+    card.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+    if (rec.status) card.querySelector('.s-' + rec.status)?.classList.add('active');
+  }
+}
+
+async function deleteRecord(id) {
+  records = records.filter(r => r.id !== id);
+  await deleteRecord_db(id);
+  renderRecords();
+  renderCatalog();
+  toast('已刪除');
+}
+
+async function convertCatalog(id) {
+  const rec = records.find(r => r.id === id);
+  if (!rec) return;
+  rec.mode = '採購紀錄';
+  const recNoPhoto = { ...rec }; delete recNoPhoto.photo;
+  await dbPut('records', recNoPhoto);
+  renderCatalog();
+  renderRecords();
+  toast('已移至採購紀錄');
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderRecords();
+}
+
+function renderSummary() {
+  const recs = records.filter(r => r.mode !== '暫存目錄');
+  const bizRecs = recs.filter(r => r.type === '業務' && r.price && r.currency);
+  const personalRecs = recs.filter(r => r.type === '私人' && r.price && r.currency);
+
+  function calcTotal(arr) {
+    let twd = 0;
+    const byCur = {};
+    arr.forEach(r => {
+      const p = parseFloat(r.price) || 0;
+      byCur[r.currency] = (byCur[r.currency] || 0) + p;
+      twd += toTWD(r.price, r.currency) || 0;
+    });
+    return { byCur, twd };
+  }
+
+  const bizTotal = calcTotal(bizRecs);
+  const personalTotal = calcTotal(personalRecs);
+  const allTotal = calcTotal(recs.filter(r => r.price && r.currency));
+
+  function renderBlock(title, data, count) {
+    const curRows = Object.entries(data.byCur).map(([c, v]) => {
+      const twdEq = c !== 'TWD' ? ` <span style="font-size:11px;color:var(--gold);font-style:italic">≈ TWD ${Math.round(v * rates[c]).toLocaleString()}</span>` : '';
+      return `<div class="summary-row">
+        <span>${c}</span>
+        <span class="summary-amount">${v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})} ${c}${twdEq}</span>
+      </div>`;
+    }).join('');
+    const divider = Object.keys(data.byCur).length > 0 ? `<div style="border-top:1px solid var(--divider);margin:6px 0"></div>` : '';
+    return `<div class="summary-card">
+      <div class="summary-card-title">${title} <span style="font-size:12px;color:var(--light)">(${count} 件)</span></div>
+      ${curRows}
+      ${divider}
+      <div class="summary-row"><span style="font-weight:500">合計折台幣</span><span class="summary-amount" style="color:var(--gold);font-size:20px">TWD ${data.twd.toLocaleString()}</span></div>
+    </div>`;
+  }
+
+  const statusCount = {
+    buy: recs.filter(r => r.status === 'buy').length,
+    bought: recs.filter(r => r.status === 'bought').length,
+    pass: recs.filter(r => r.status === 'pass').length,
+  };
+
+  document.getElementById('summary-content').innerHTML = `
+    <div class="summary-card">
+      <div class="summary-card-title">今日狀態</div>
+      <div class="summary-row"><span>要買</span><span class="summary-amount" style="color:var(--status-buy)">${statusCount.buy} 件</span></div>
+      <div class="summary-row"><span>已買</span><span class="summary-amount" style="color:var(--status-bought)">${statusCount.bought} 件</span></div>
+      <div class="summary-row"><span>放棄</span><span class="summary-amount" style="color:var(--status-pass)">${statusCount.pass} 件</span></div>
+    </div>
+    ${renderBlock('業務花費', bizTotal, bizRecs.length)}
+    ${renderBlock('私人花費', personalTotal, personalRecs.length)}
+    ${renderBlock('合計', allTotal, recs.filter(r => r.price && r.currency).length)}
+  `;
+}
+
+// Batch currency
+function openBatchCurrencyModal() {
+  const noCurrency = records.filter(r => !r.currency);
+  const list = document.getElementById('batch-list');
+  batchSelections = {};
+  if (!noCurrency.length) {
+    list.innerHTML = `<p style="font-size:12px;color:var(--light);letter-spacing:1.5px">所有紀錄均已填幣別</p>`;
+  } else {
+    list.innerHTML = noCurrency.map(r => `
+      <div class="batch-item">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+          <input type="checkbox" id="bsel-${r.id}" onchange="toggleBatchSel('${r.id}',this)">
+          <span>${r.name || '（未命名）'} — ${r.price || '無價格'} — ${r.date || ''}</span>
+        </label>
+      </div>`).join('');
+  }
+  document.getElementById('batch-currency-modal').classList.add('open');
+}
+
+function toggleBatchSel(id, cb) {
+  if (cb.checked) batchSelections[id] = true;
+  else delete batchSelections[id];
+}
+
+async function applyBatchCurrency() {
+  const cur = document.getElementById('batch-currency').value;
+  for (const id of Object.keys(batchSelections)) {
+    const rec = records.find(r => r.id === id);
+    if (rec) {
+      rec.currency = cur;
+      const recNoPhoto = { ...rec }; delete recNoPhoto.photo;
+      await dbPut('records', recNoPhoto);
+    }
+  }
+  renderRecords();
+  closeModal('batch-currency-modal');
+  toast(`已套用 ${cur}`);
+}
+
+// Batch status
+function openBatchModal() {
+  const recs = records.filter(r => r.mode !== '暫存目錄');
+  const list = document.getElementById('batch-status-list');
+  list.innerHTML = recs.map(r => `
+    <div class="batch-item">
+      <span style="flex:1">${r.name || '（未命名）'} ${r.price ? r.price + (r.currency||'') : ''}</span>
+      <div style="display:flex;gap:4px">
+        <button class="status-btn s-buy ${r.status==='buy'?'active':''}" onclick="batchSetStatus('${r.id}','buy',this)">要買</button>
+        <button class="status-btn s-bought ${r.status==='bought'?'active':''}" onclick="batchSetStatus('${r.id}','bought',this)">已買</button>
+        <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="batchSetStatus('${r.id}','pass',this)">放棄</button>
+      </div>
+    </div>`).join('') || '<p style="font-size:12px;color:var(--light)">暫無紀錄</p>';
+  document.getElementById('batch-modal').classList.add('open');
+}
+
+function batchSetStatus(id, status, btn) {
+  const rec = records.find(r => r.id === id);
+  if (!rec) return;
+  rec.status = rec.status === status ? '' : status;
+  const parent = btn.closest('.batch-item');
+  parent.querySelectorAll('.status-btn').forEach(b => b.classList.remove('active'));
+  if (rec.status) btn.classList.add('active');
+}
+
+async function saveBatchStatus() {
+  for (const rec of records) {
+    const recNoPhoto = { ...rec }; delete recNoPhoto.photo;
+    await dbPut('records', recNoPhoto);
+  }
+  renderRecords();
+  closeModal('batch-modal');
+  toast('已儲存標記');
+}
+
+// CSV export
+function exportCSV(type) {
+  let data = records.filter(r => r.mode !== '暫存目錄');
+  let filename = '採購紀錄';
+  if (type === 'biz') { data = data.filter(r => r.type === '業務'); filename = '業務採購'; }
+  if (type === 'personal') { data = data.filter(r => r.type === '私人'); filename = '私人採購'; }
+
+  const headers = ['日期','商品名稱','價格','幣別','折合台幣','城市/店名','分類','用途','狀態','有折扣','折後價','折扣備註','備註'];
+  const rows = data.map(r => [
+    r.date || '', r.name || '', r.price || '', r.currency || '',
+    toTWD(r.price, r.currency) || '',
+    r.location || '', r.category || '', r.type || '', r.status || '',
+    r.hasDiscount ? '是' : '否', r.discountPrice || '', r.discountNote || '', r.note || ''
+  ]);
+
+  const csv = [headers, ...rows].map(row => row.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const bom = '\ufeff';
+  const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}_${new Date().toLocaleDateString('zh-TW').replace(/\//g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV 匯出完成');
+}
+
+async function clearAll() {
+  if (confirm('確定要清除所有資料？')) {
+    records = [];
+    await dbClear('records');
+    await dbClear('photos');
+    renderRecords();
+    renderCatalog();
+    toast('已清除');
+  }
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// Init
+openDB().then(async () => {
+  await loadRates();
+  await loadAllRecords();
+  renderRecords();
+}).catch(err => {
+  console.error('DB init failed', err);
+  // fallback: just render empty
+  loadRateInputs();
+  renderRecords();
+});
+</script>
+</body>
+</html>
