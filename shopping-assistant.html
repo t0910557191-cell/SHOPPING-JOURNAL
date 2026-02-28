@@ -262,14 +262,9 @@
     transition: border-color 0.2s;
     position: relative;
     overflow: hidden;
+    display: block;
   }
   .photo-area:hover { border-color: var(--gold); }
-  .photo-area input[type=file] {
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    cursor: pointer;
-  }
   .photo-preview {
     width: 100%;
     max-height: 160px;
@@ -719,14 +714,14 @@
 
     <!-- Photo -->
     <div class="form-section">
-      <div class="photo-area" id="photo-area" onclick="document.getElementById('photo-input').click()">
-        <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)">
+      <label class="photo-area" id="photo-area" for="photo-input">
+        <input type="file" id="photo-input" accept="image/*" onchange="handlePhoto(event)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
         <div id="photo-placeholder" class="photo-placeholder">
           <div class="photo-icon">📷</div>
           <div>拍照或選擇圖片</div>
         </div>
         <img id="photo-preview" class="photo-preview" style="display:none">
-      </div>
+      </label>
     </div>
 
     <!-- Name -->
