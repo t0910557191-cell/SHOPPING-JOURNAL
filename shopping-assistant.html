@@ -804,6 +804,18 @@
         <input type="number" class="settings-input-sm" id="rate-RMB" value="4.5" onchange="saveRates()">
       </div>
       <div class="settings-row">
+        <span class="settings-row-label">JPY → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-JPY" value="0.22" onchange="saveRates()">
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">KRW → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-KRW" value="0.024" onchange="saveRates()">
+      </div>
+      <div class="settings-row">
+        <span class="settings-row-label">USD → TWD</span>
+        <input type="number" class="settings-input-sm" id="rate-USD" value="32" onchange="saveRates()">
+      </div>
+      <div class="settings-row">
         <span class="settings-row-label">TWD → TWD</span>
         <input type="number" class="settings-input-sm" id="rate-TWD" value="1" readonly style="opacity:0.5">
       </div>
@@ -1055,9 +1067,12 @@
         </div>
         <select class="form-select" id="f-currency" onchange="updateTwdHint()">
           <option value="">幣別</option>
-          <option value="EUR">EUR</option>
-          <option value="RMB">RMB</option>
-          <option value="TWD">TWD</option>
+          <option value="EUR">EUR 歐元</option>
+          <option value="RMB">RMB 人民幣</option>
+          <option value="JPY">JPY 日圓</option>
+          <option value="KRW">KRW 韓元</option>
+          <option value="USD">USD 美元</option>
+          <option value="TWD">TWD 台幣</option>
         </select>
       </div>
     </div>
@@ -1105,11 +1120,14 @@
           <input type="number" class="form-input" id="f-sell-price" placeholder="售價（選填）" oninput="updateMargin()">
           <span class="price-hint" id="sell-hint"></span>
         </div>
-        <select class="form-select" id="f-sell-currency" onchange="updateMargin()" style="max-width:80px">
+        <select class="form-select" id="f-sell-currency" onchange="updateMargin()" style="min-width:110px">
           <option value="">幣別</option>
-          <option value="EUR">EUR</option>
-          <option value="RMB">RMB</option>
-          <option value="TWD">TWD</option>
+          <option value="EUR">EUR 歐元</option>
+          <option value="RMB">RMB 人民幣</option>
+          <option value="JPY">JPY 日圓</option>
+          <option value="KRW">KRW 韓元</option>
+          <option value="USD">USD 美元</option>
+          <option value="TWD">TWD 台幣</option>
         </select>
       </div>
       <div id="margin-hint" class="calc-hint" style="margin-top:6px"></div>
@@ -1174,9 +1192,12 @@
     <div style="margin-top:14px">
       <label class="form-label">套用幣別</label>
       <select class="form-select" id="batch-currency">
-        <option value="EUR">EUR</option>
-        <option value="RMB">RMB</option>
-        <option value="TWD">TWD</option>
+        <option value="EUR">EUR 歐元</option>
+        <option value="RMB">RMB 人民幣</option>
+        <option value="JPY">JPY 日圓</option>
+        <option value="KRW">KRW 韓元</option>
+        <option value="USD">USD 美元</option>
+        <option value="TWD">TWD 台幣</option>
       </select>
     </div>
     <button class="btn-save" style="margin-top:14px" onclick="applyBatchCurrency()">套 用 選 取</button>
@@ -1270,7 +1291,7 @@ function dbClear(store) {
 
 // ── App state ──
 let records = [];
-let rates = { EUR: 35, RMB: 4.5, TWD: 1 };
+let rates = { EUR: 35, RMB: 4.5, JPY: 0.22, KRW: 0.024, USD: 32, TWD: 1 };
 let currentFilter = 'all';
 let photoData = null;
 let photoBlob = null;
@@ -1315,6 +1336,9 @@ async function loadAllRecords() {
 async function saveRates() {
   rates.EUR = parseFloat(document.getElementById('rate-EUR').value) || 35;
   rates.RMB = parseFloat(document.getElementById('rate-RMB').value) || 4.5;
+  rates.JPY = parseFloat(document.getElementById('rate-JPY').value) || 0.22;
+  rates.KRW = parseFloat(document.getElementById('rate-KRW').value) || 0.024;
+  rates.USD = parseFloat(document.getElementById('rate-USD').value) || 32;
   rates.TWD = 1;
   await dbPut('settings', { key: 'rates', value: rates });
   renderRecords();
@@ -1683,10 +1707,10 @@ function recordCardHTML(r, isCatalog = false) {
   const twdStr = twd && cur !== 'TWD' ? ` <span class="record-price-twd">≈ TWD ${twd.toLocaleString()}</span>` : '';
   const discTwd = r.hasDiscount && r.discountPrice && cur !== 'TWD'
     ? Math.round(parseFloat(r.discountPrice) * (rates[cur] || 1)) : null;
-  const discStr = r.hasDiscount && r.discountPrice
-    ? ` <span style="opacity:0.5;font-size:11px">→ 折</span> <span style="color:var(--gold)">${r.discountPrice} ${cur}${discTwd ? ` <span class="record-price-twd">≈ TWD ${discTwd.toLocaleString()}</span>` : ''}</span>`
+  const discLine = r.hasDiscount && r.discountPrice
+    ? `<div style="font-size:12px;margin-top:2px"><span style="opacity:0.5">折</span> <span style="color:var(--gold)">${r.discountPrice} ${cur}${discTwd ? ` <span class="record-price-twd">≈ TWD ${discTwd.toLocaleString()}</span>` : ''}</span></div>`
     : '';
-  const priceStr = r.price ? `<span style="opacity:0.55;font-size:11px">買</span> ${r.price} ${cur}${twdStr}${discStr}` : '—';
+  const priceStr = r.price ? `<span style="opacity:0.55;font-size:11px">買</span> ${r.price} ${cur}${twdStr}` : '—';
   const margin = calcMargin(r);
   const discMargin = calcDiscountMargin(r);
 
@@ -1720,6 +1744,7 @@ function recordCardHTML(r, isCatalog = false) {
         <div class="record-name">${r.name || '（未命名）'}</div>
         <div class="record-meta">${[r.country, r.city, r.store].filter(Boolean).join(' · ') || ''}${r.date ? ' · ' + r.date : ''}</div>
         <div class="record-price">${priceStr}</div>
+        ${discLine}
         ${bizLine}
         ${inlineStatus}
       </div>
