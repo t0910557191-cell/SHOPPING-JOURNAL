@@ -1568,11 +1568,8 @@ function updateMargin() {
     const sameRate = buyRate === sellRate;
     return `<div style="margin-top:4px;line-height:1.6">`
       + `${label}<span class="${cls}"><strong>${m}%</strong></span>`
-      + `<span style="opacity:0.6;font-size:11px"> /件</span>`
-      + `　獲利 TWD ${profitTotal.toLocaleString()}`
-      + `<br><span style="opacity:0.65;font-size:11px">`
-      + `成本 ${costTWDper.toFixed(0)} TWD／件 → 售 ${sellTWDper.toFixed(0)} TWD／件`
-      + `</span></div>`;
+      + `　獲利 <span class="${cls}">TWD ${profitPerUnit.toFixed(0)}</span><span style="opacity:0.6;font-size:11px"> /件</span>`
+      + `</div>`;
   }
 
   let html = marginLine(costPerUnitTWD, sellPerUnitTWD, buyCur, sellCur, '原價毛利　');
