@@ -1704,9 +1704,16 @@ function recordCardHTML(r, isCatalog = false) {
       <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="setStatus('${r.id}','pass',this)">放棄</button>
     </div>` : '';
 
-  const bizLine = r.qty ? `
+  const marginDisplay = discMargin !== null
+    ? `<span class="${discMargin >= 0 ? 'margin-positive' : 'margin-negative'}">${discMargin}%</span>`
+    : margin !== null
+      ? `<span class="${margin >= 0 ? 'margin-positive' : 'margin-negative'}">${margin}%</span>`
+      : '';
+  const bizLine = (r.qty || r.sellPrice || margin !== null) ? `
     <div class="record-biz-line">
-      <span>×${r.qty} 件</span>
+      ${r.qty ? `<span>×${r.qty} 件</span>` : ''}
+      ${r.sellPrice ? `<span>售 ${parseFloat(r.sellPrice).toLocaleString()} ${r.sellCurrency || cur}</span>` : ''}
+      ${marginDisplay ? `<span>毛利 ${marginDisplay}</span>` : ''}
     </div>` : '';
 
   return `<div class="record-card" id="card-${r.id}">
