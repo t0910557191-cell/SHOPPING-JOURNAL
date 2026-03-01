@@ -396,20 +396,33 @@
     text-overflow: ellipsis;
   }
   .record-meta {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--light);
-    letter-spacing: 1px;
-    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
   }
   .record-price {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 18px;
+    font-size: 17px;
     color: var(--dark);
+    margin-bottom: 3px;
   }
   .record-price-twd {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--gold);
     margin-left: 4px;
+  }
+  .record-biz-line {
+    font-size: 12px;
+    color: var(--light);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .thumb-wrap {
+    flex-shrink: 0;
+    text-align: center;
   }
 
   .record-tags {
@@ -419,12 +432,13 @@
     padding: 0 12px 10px;
   }
   .tag {
-    padding: 2px 8px;
+    padding: 3px 8px;
     border-radius: 2px;
-    font-size: 10px;
-    letter-spacing: 1px;
+    font-size: 11px;
+    letter-spacing: 0.5px;
   }
   .tag-cat { background: var(--cream); color: var(--mid); border: 1px solid var(--divider); }
+  .tag-note { background: var(--warm-white); color: var(--mid); border: 1px solid var(--divider); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tag-biz { background: #e8ede8; color: #4a6a4a; }
   .tag-personal { background: #ede8ec; color: #6a4a68; }
   .tag-discount { background: #fdf3e3; color: var(--accent); border: 1px solid var(--gold-pale); }
@@ -441,8 +455,8 @@
   .status-btn {
     padding: 4px 10px;
     border-radius: 2px;
-    font-size: 10px;
-    letter-spacing: 1.5px;
+    font-size: 11px;
+    letter-spacing: 1px;
     cursor: pointer;
     border: 1px solid var(--divider);
     background: transparent;
@@ -466,7 +480,7 @@
     background: none;
     border: 1px solid var(--divider);
     color: var(--light);
-    font-size: 11px;
+    font-size: 12px;
     padding: 4px 8px;
     border-radius: 2px;
     cursor: pointer;
@@ -609,6 +623,74 @@
     padding: 3px 8px;
     letter-spacing: 1px;
   }
+
+  /* Note line under thumb */
+  .record-note-line {
+    font-size: 11px;
+    color: var(--light);
+    font-style: italic;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 64px;
+    text-align: center;
+  }
+
+  /* Business calc fields */
+  .calc-hint {
+    font-size: 11px;
+    color: var(--gold);
+    margin-top: 4px;
+    font-style: italic;
+    letter-spacing: 0.5px;
+  }
+  .margin-positive { color: var(--status-buy); }
+  .margin-negative { color: var(--status-pass); }
+
+  /* Sort/filter panel */
+  .sort-bar {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--divider);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .sort-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--light);
+    white-space: nowrap;
+  }
+  .sort-select {
+    background: var(--cream);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    padding: 5px 8px;
+    font-size: 11px;
+    color: var(--mid);
+    font-family: 'Noto Serif TC', serif;
+    cursor: pointer;
+    flex: 1;
+    min-width: 0;
+  }
+  .sort-select:focus { outline: none; border-color: var(--gold); }
+  .sort-dir {
+    background: var(--cream);
+    border: 1px solid var(--divider);
+    border-radius: 2px;
+    padding: 5px 8px;
+    font-size: 12px;
+    color: var(--mid);
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'Noto Serif TC', serif;
+    flex-shrink: 0;
+  }
+  .sort-dir.asc::after { content: ' ↑'; }
+  .sort-dir.desc::after { content: ' ↓'; }
 </style>
 </head>
 <body>
@@ -643,6 +725,27 @@
     <button class="filter-chip" onclick="setFilter('biz', this)">業務</button>
     <button class="filter-chip" onclick="setFilter('personal', this)">私人</button>
   </div>
+  <div class="sort-bar">
+    <span class="sort-label">篩選</span>
+    <select class="sort-select" id="filter-country" onchange="renderRecords()">
+      <option value="">所有國家</option>
+    </select>
+    <select class="sort-select" id="filter-city" onchange="renderRecords()">
+      <option value="">所有城市</option>
+    </select>
+    <select class="sort-select" id="filter-store" onchange="renderRecords()">
+      <option value="">所有店名</option>
+    </select>
+    <span class="sort-label">排序</span>
+    <select class="sort-select" id="sort-field-records" onchange="renderRecords()">
+      <option value="date">日期</option>
+      <option value="price">採購成本</option>
+      <option value="margin">毛利率</option>
+      <option value="qty">數量</option>
+      <option value="shipping">運費</option>
+    </select>
+    <button class="sort-dir desc" id="sort-dir-records" onclick="toggleSortDir('records')"></button>
+  </div>
   <div id="record-list" class="record-list">
     <div class="empty-state">
       <div class="empty-icon">✦</div>
@@ -653,6 +756,27 @@
 
 <!-- Catalog page -->
 <div id="page-catalog" class="page">
+  <div class="sort-bar">
+    <span class="sort-label">篩選</span>
+    <select class="sort-select" id="filter-country-cat" onchange="renderCatalog()">
+      <option value="">所有國家</option>
+    </select>
+    <select class="sort-select" id="filter-city-cat" onchange="renderCatalog()">
+      <option value="">所有城市</option>
+    </select>
+    <select class="sort-select" id="filter-store-cat" onchange="renderCatalog()">
+      <option value="">所有店名</option>
+    </select>
+    <span class="sort-label">排序</span>
+    <select class="sort-select" id="sort-field-catalog" onchange="renderCatalog()">
+      <option value="date">日期</option>
+      <option value="price">採購成本</option>
+      <option value="margin">毛利率</option>
+      <option value="qty">數量</option>
+      <option value="shipping">運費</option>
+    </select>
+    <button class="sort-dir desc" id="sort-dir-catalog" onclick="toggleSortDir('catalog')"></button>
+  </div>
   <div id="catalog-list" class="record-list">
     <div class="empty-state">
       <div class="empty-icon">◇</div>
@@ -687,9 +811,10 @@
     <div class="settings-group">
       <div class="settings-group-title">資料匯出</div>
       <div style="padding:14px">
-        <button class="btn-export" onclick="exportCSV('all')">匯出全部紀錄 CSV</button>
-        <button class="btn-export" onclick="exportCSV('biz')">匯出業務紀錄 CSV</button>
-        <button class="btn-export" onclick="exportCSV('personal')">匯出私人紀錄 CSV</button>
+        <button class="btn-export" onclick="exportExcel('all')">匯出全部紀錄 Excel（含照片）</button>
+        <button class="btn-export" onclick="exportExcel('biz')">匯出業務紀錄 Excel（含照片）</button>
+        <button class="btn-export" onclick="exportExcel('personal')">匯出私人紀錄 Excel（含照片）</button>
+        <button class="btn-export" style="font-size:10px;opacity:0.7" onclick="exportCSV('all')">匯出 CSV（純文字，無照片）</button>
       </div>
     </div>
     <div class="settings-group">
@@ -730,9 +855,199 @@
       <input type="text" class="form-input" id="f-name" placeholder="選填">
     </div>
 
+    <!-- Country + City + Store -->
+    <div class="form-section">
+      <label class="form-label">國家 / 城市 / 店名</label>
+      <div class="form-row">
+        <select class="form-select" id="f-country">
+          <option value="">國家（選填）</option>
+          <option value="中國">中國</option>
+          <option value="日本">日本</option>
+          <option value="韓國">韓國</option>
+          <option value="台灣">台灣</option>
+          <option value="香港">香港</option>
+          <option value="澳門">澳門</option>
+          <option value="蒙古">蒙古</option>
+          <option value="新加坡">新加坡</option>
+          <option value="泰國">泰國</option>
+          <option value="越南">越南</option>
+          <option value="馬來西亞">馬來西亞</option>
+          <option value="印尼">印尼</option>
+          <option value="菲律賓">菲律賓</option>
+          <option value="緬甸">緬甸</option>
+          <option value="柬埔寨">柬埔寨</option>
+          <option value="寮國">寮國</option>
+          <option value="汶萊">汶萊</option>
+          <option value="東帝汶">東帝汶</option>
+          <option value="印度">印度</option>
+          <option value="巴基斯坦">巴基斯坦</option>
+          <option value="孟加拉">孟加拉</option>
+          <option value="斯里蘭卡">斯里蘭卡</option>
+          <option value="尼泊爾">尼泊爾</option>
+          <option value="不丹">不丹</option>
+          <option value="馬爾地夫">馬爾地夫</option>
+          <option value="哈薩克">哈薩克</option>
+          <option value="烏茲別克">烏茲別克</option>
+          <option value="土庫曼">土庫曼</option>
+          <option value="吉爾吉斯">吉爾吉斯</option>
+          <option value="塔吉克">塔吉克</option>
+          <option value="土耳其">土耳其</option>
+          <option value="阿聯酋">阿聯酋</option>
+          <option value="沙烏地阿拉伯">沙烏地阿拉伯</option>
+          <option value="以色列">以色列</option>
+          <option value="約旦">約旦</option>
+          <option value="黎巴嫩">黎巴嫩</option>
+          <option value="敘利亞">敘利亞</option>
+          <option value="伊拉克">伊拉克</option>
+          <option value="伊朗">伊朗</option>
+          <option value="科威特">科威特</option>
+          <option value="巴林">巴林</option>
+          <option value="卡達">卡達</option>
+          <option value="阿曼">阿曼</option>
+          <option value="葉門">葉門</option>
+          <option value="亞美尼亞">亞美尼亞</option>
+          <option value="亞塞拜然">亞塞拜然</option>
+          <option value="喬治亞">喬治亞</option>
+          <option value="法國">法國</option>
+          <option value="義大利">義大利</option>
+          <option value="西班牙">西班牙</option>
+          <option value="德國">德國</option>
+          <option value="英國">英國</option>
+          <option value="荷蘭">荷蘭</option>
+          <option value="比利時">比利時</option>
+          <option value="瑞士">瑞士</option>
+          <option value="奧地利">奧地利</option>
+          <option value="葡萄牙">葡萄牙</option>
+          <option value="盧森堡">盧森堡</option>
+          <option value="愛爾蘭">愛爾蘭</option>
+          <option value="摩納哥">摩納哥</option>
+          <option value="安道爾">安道爾</option>
+          <option value="列支敦斯登">列支敦斯登</option>
+          <option value="馬爾他">馬爾他</option>
+          <option value="瑞典">瑞典</option>
+          <option value="挪威">挪威</option>
+          <option value="丹麥">丹麥</option>
+          <option value="芬蘭">芬蘭</option>
+          <option value="冰島">冰島</option>
+          <option value="愛沙尼亞">愛沙尼亞</option>
+          <option value="拉脫維亞">拉脫維亞</option>
+          <option value="立陶宛">立陶宛</option>
+          <option value="波蘭">波蘭</option>
+          <option value="捷克">捷克</option>
+          <option value="匈牙利">匈牙利</option>
+          <option value="斯洛伐克">斯洛伐克</option>
+          <option value="斯洛維尼亞">斯洛維尼亞</option>
+          <option value="克羅埃西亞">克羅埃西亞</option>
+          <option value="波士尼亞">波士尼亞</option>
+          <option value="塞爾維亞">塞爾維亞</option>
+          <option value="北馬其頓">北馬其頓</option>
+          <option value="阿爾巴尼亞">阿爾巴尼亞</option>
+          <option value="蒙特內哥羅">蒙特內哥羅</option>
+          <option value="科索沃">科索沃</option>
+          <option value="羅馬尼亞">羅馬尼亞</option>
+          <option value="保加利亞">保加利亞</option>
+          <option value="希臘">希臘</option>
+          <option value="賽普勒斯">賽普勒斯</option>
+          <option value="烏克蘭">烏克蘭</option>
+          <option value="白俄羅斯">白俄羅斯</option>
+          <option value="摩爾多瓦">摩爾多瓦</option>
+          <option value="俄羅斯">俄羅斯</option>
+          <option value="美國">美國</option>
+          <option value="加拿大">加拿大</option>
+          <option value="墨西哥">墨西哥</option>
+          <option value="瓜地馬拉">瓜地馬拉</option>
+          <option value="貝里斯">貝里斯</option>
+          <option value="宏都拉斯">宏都拉斯</option>
+          <option value="薩爾瓦多">薩爾瓦多</option>
+          <option value="尼加拉瓜">尼加拉瓜</option>
+          <option value="哥斯大黎加">哥斯大黎加</option>
+          <option value="巴拿馬">巴拿馬</option>
+          <option value="古巴">古巴</option>
+          <option value="牙買加">牙買加</option>
+          <option value="海地">海地</option>
+          <option value="多明尼加">多明尼加</option>
+          <option value="波多黎各">波多黎各</option>
+          <option value="巴哈馬">巴哈馬</option>
+          <option value="巴貝多">巴貝多</option>
+          <option value="千里達及托巴哥">千里達及托巴哥</option>
+          <option value="巴西">巴西</option>
+          <option value="阿根廷">阿根廷</option>
+          <option value="智利">智利</option>
+          <option value="秘魯">秘魯</option>
+          <option value="哥倫比亞">哥倫比亞</option>
+          <option value="委內瑞拉">委內瑞拉</option>
+          <option value="厄瓜多">厄瓜多</option>
+          <option value="玻利維亞">玻利維亞</option>
+          <option value="巴拉圭">巴拉圭</option>
+          <option value="烏拉圭">烏拉圭</option>
+          <option value="蓋亞那">蓋亞那</option>
+          <option value="蘇利南">蘇利南</option>
+          <option value="澳洲">澳洲</option>
+          <option value="紐西蘭">紐西蘭</option>
+          <option value="斐濟">斐濟</option>
+          <option value="巴布亞紐幾內亞">巴布亞紐幾內亞</option>
+          <option value="萬那杜">萬那杜</option>
+          <option value="索羅門群島">索羅門群島</option>
+          <option value="薩摩亞">薩摩亞</option>
+          <option value="東加">東加</option>
+          <option value="埃及">埃及</option>
+          <option value="利比亞">利比亞</option>
+          <option value="突尼西亞">突尼西亞</option>
+          <option value="阿爾及利亞">阿爾及利亞</option>
+          <option value="摩洛哥">摩洛哥</option>
+          <option value="蘇丹">蘇丹</option>
+          <option value="南蘇丹">南蘇丹</option>
+          <option value="衣索比亞">衣索比亞</option>
+          <option value="肯亞">肯亞</option>
+          <option value="坦尚尼亞">坦尚尼亞</option>
+          <option value="烏干達">烏干達</option>
+          <option value="盧安達">盧安達</option>
+          <option value="蒲隆地">蒲隆地</option>
+          <option value="索馬利亞">索馬利亞</option>
+          <option value="馬達加斯加">馬達加斯加</option>
+          <option value="莫三比克">莫三比克</option>
+          <option value="尚比亞">尚比亞</option>
+          <option value="辛巴威">辛巴威</option>
+          <option value="馬拉威">馬拉威</option>
+          <option value="奈及利亞">奈及利亞</option>
+          <option value="迦納">迦納</option>
+          <option value="塞內加爾">塞內加爾</option>
+          <option value="象牙海岸">象牙海岸</option>
+          <option value="喀麥隆">喀麥隆</option>
+          <option value="馬利">馬利</option>
+          <option value="布吉納法索">布吉納法索</option>
+          <option value="幾內亞">幾內亞</option>
+          <option value="貝南">貝南</option>
+          <option value="多哥">多哥</option>
+          <option value="尼日">尼日</option>
+          <option value="查德">查德</option>
+          <option value="茅利塔尼亞">茅利塔尼亞</option>
+          <option value="南非">南非</option>
+          <option value="納米比亞">納米比亞</option>
+          <option value="波扎那">波扎那</option>
+          <option value="賴索托">賴索托</option>
+          <option value="史瓦帝尼">史瓦帝尼</option>
+          <option value="剛果民主共和國">剛果民主共和國</option>
+          <option value="剛果共和國">剛果共和國</option>
+          <option value="安哥拉">安哥拉</option>
+          <option value="加彭">加彭</option>
+          <option value="赤道幾內亞">赤道幾內亞</option>
+          <option value="中非共和國">中非共和國</option>
+        </select>
+        <input type="text" class="form-input" id="f-city" placeholder="城市（選填）">
+        <input type="text" class="form-input" id="f-store" placeholder="店名（選填）">
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div class="form-section">
+      <label class="form-label">日期</label>
+      <input type="date" class="form-input" id="f-date">
+    </div>
+
     <!-- Price + currency -->
     <div class="form-section">
-      <label class="form-label">價格 / 幣別</label>
+      <label class="form-label">採購價格 / 幣別</label>
       <div class="form-row">
         <div class="price-wrap">
           <input type="number" class="form-input" id="f-price" placeholder="選填" oninput="updateTwdHint()">
@@ -747,15 +1062,6 @@
       </div>
     </div>
 
-    <!-- City + Store -->
-    <div class="form-section">
-      <label class="form-label">城市 / 店名</label>
-      <div class="form-row">
-        <input type="text" class="form-input" id="f-city" placeholder="城市（選填）">
-        <input type="text" class="form-input" id="f-store" placeholder="店名（選填）">
-      </div>
-    </div>
-
     <!-- Discount -->
     <div class="form-section">
       <label class="form-label">折扣</label>
@@ -767,12 +1073,46 @@
       <div id="discount-fields" style="display:none;margin-top:10px">
         <div class="form-row">
           <div class="price-wrap">
-            <input type="number" class="form-input" id="f-discount-price" placeholder="折後價" oninput="updateDiscountHint()">
+            <input type="number" class="form-input" id="f-discount-price" placeholder="折扣後採購價" oninput="updateDiscountHint()">
             <span class="price-hint" id="discount-hint"></span>
           </div>
           <input type="text" class="form-input" id="f-discount-note" placeholder="折扣備註">
         </div>
       </div>
+    </div>
+
+    <div class="form-section">
+      <label class="form-label" id="shipping-label">運費（選填）</label>
+      <div class="form-row" style="align-items:center">
+        <div class="price-wrap">
+          <input type="number" class="form-input" id="f-shipping" placeholder="運費（選填）" oninput="updateMargin()">
+          <span class="price-hint" id="shipping-hint"></span>
+        </div>
+        <label class="discount-toggle" style="white-space:nowrap">
+          <input type="checkbox" id="f-shipping-in-cost" onchange="updateMargin()">
+          <span class="discount-dot"></span>
+          <span class="discount-label">計入成本</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Business fields -->
+    <div class="form-section">
+      <label class="form-label" id="sell-price-label">數量 / 售價</label>
+      <div class="form-row">
+        <input type="number" class="form-input" id="f-qty" placeholder="數量（選填）" min="1" oninput="updateMargin()">
+        <div class="price-wrap">
+          <input type="number" class="form-input" id="f-sell-price" placeholder="售價（選填）" oninput="updateMargin()">
+          <span class="price-hint" id="sell-hint"></span>
+        </div>
+        <select class="form-select" id="f-sell-currency" onchange="updateMargin()" style="max-width:80px">
+          <option value="">幣別</option>
+          <option value="EUR">EUR</option>
+          <option value="RMB">RMB</option>
+          <option value="TWD">TWD</option>
+        </select>
+      </div>
+      <div id="margin-hint" class="calc-hint" style="margin-top:6px"></div>
     </div>
 
     <!-- Category -->
@@ -932,9 +1272,10 @@ function dbClear(store) {
 let records = [];
 let rates = { EUR: 35, RMB: 4.5, TWD: 1 };
 let currentFilter = 'all';
-let photoData = null; // current editing photo (blob URL or base64)
-let photoBlob = null; // raw blob for saving to IndexedDB
+let photoData = null;
+let photoBlob = null;
 let batchSelections = {};
+let sortDirs = { records: 'desc', catalog: 'desc' };
 
 async function saveData() {
   // Save all records (without photo) to IndexedDB records store
@@ -1014,12 +1355,31 @@ function openAddModal(editId = null) {
     document.getElementById('f-name').value = rec.name || '';
     document.getElementById('f-price').value = rec.price || '';
     document.getElementById('f-currency').value = rec.currency || '';
+    document.getElementById('f-country').value = rec.country || '';
     document.getElementById('f-city').value = rec.city || '';
     document.getElementById('f-store').value = rec.store || '';
     document.getElementById('f-category').value = rec.category || '';
     document.getElementById('f-type').value = rec.type || '';
     document.getElementById('f-mode').value = rec.mode || '採購紀錄';
     document.getElementById('f-note').value = rec.note || '';
+    document.getElementById('f-qty').value = rec.qty || '';
+    document.getElementById('f-sell-price').value = rec.sellPrice || '';
+    document.getElementById('f-sell-currency').value = rec.sellCurrency || '';
+    document.getElementById('f-shipping').value = rec.shipping || '';
+    document.getElementById('f-shipping-in-cost').checked = rec.shippingInCost || false;
+    // Set date - convert zh-TW format back to input[type=date] format if needed
+    if (rec.date) {
+      // Try to parse zh-TW date like 114/5/20 or standard yyyy/mm/dd
+      let d = rec.date.replace(/\//g, '-');
+      // If year < 1000 it's ROC calendar, convert to AD
+      const parts = d.split('-');
+      if (parts.length === 3 && parseInt(parts[0]) < 200) {
+        d = (parseInt(parts[0]) + 1911) + '-' + parts[1].padStart(2,'0') + '-' + parts[2].padStart(2,'0');
+      }
+      document.getElementById('f-date').value = d;
+    } else {
+      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+    }
     if (rec.hasDiscount) {
       document.getElementById('f-has-discount').checked = true;
       document.getElementById('discount-fields').style.display = 'block';
@@ -1040,7 +1400,10 @@ function openAddModal(editId = null) {
   } else {
     document.getElementById('modal-title-text').textContent = '新增紀錄';
     document.querySelector('#mode-group .toggle-btn').classList.add('active');
-    document.getElementById('f-mode').value = '採購紀錄';
+    document.getElementById('f-country').value = '';
+  document.getElementById('f-mode').value = '採購紀錄';
+  document.getElementById('f-shipping-in-cost').checked = false;
+  document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
   }
   document.getElementById('add-modal').classList.add('open');
 }
@@ -1054,7 +1417,7 @@ function restoreToggle(groupId, value) {
 }
 
 function clearForm() {
-  ['f-name','f-price','f-currency','f-city','f-store','f-category','f-type','f-note','f-edit-id','f-discount-price','f-discount-note'].forEach(id => {
+  ['f-name','f-price','f-currency','f-city','f-store','f-category','f-type','f-note','f-edit-id','f-discount-price','f-discount-note','f-qty','f-sell-price','f-shipping','f-date'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1107,14 +1470,119 @@ function updateTwdHint() {
   const price = document.getElementById('f-price').value;
   const cur = document.getElementById('f-currency').value;
   const twd = toTWD(price, cur);
-  document.getElementById('twd-hint').textContent = twd && cur !== 'TWD' ? `≈${twd}` : '';
+  document.getElementById('twd-hint').textContent = twd && cur !== 'TWD' ? `≈ TWD ${twd.toLocaleString()}` : '';
+  // Update labels and hints when buy currency changes
+  const curLabel = cur || 'TWD';
+  const shipLabel = document.getElementById('shipping-label');
+  if (shipLabel) shipLabel.textContent = `運費 ${curLabel}（選填）`;
+  const shipInput = document.getElementById('f-shipping');
+  if (shipInput) shipInput.placeholder = `運費（${curLabel}，選填）`;
+  updateMargin();
 }
 
 function updateDiscountHint() {
   const price = document.getElementById('f-discount-price').value;
   const cur = document.getElementById('f-currency').value;
   const twd = toTWD(price, cur);
-  document.getElementById('discount-hint').textContent = twd && cur !== 'TWD' ? `≈${twd}` : '';
+  document.getElementById('discount-hint').textContent = twd && cur !== 'TWD' ? `≈ TWD ${twd.toLocaleString()}` : '';
+}
+
+function calcMargin(r) {
+  if (!r.price || !r.sellPrice) return null;
+  const qty = parseFloat(r.qty) || 1;
+  const buyRate = rates[r.currency] || 1;
+  const sellRate = rates[r.sellCurrency] || 1;
+  const costTWD = parseFloat(r.price) * buyRate;
+  const shippingTWD = r.shippingInCost ? (parseFloat(r.shipping) || 0) * buyRate / qty : 0;
+  const costPerUnitTWD = costTWD + shippingTWD;
+  const sellPerUnitTWD = parseFloat(r.sellPrice) * sellRate;
+  if (sellPerUnitTWD === 0) return null;
+  return Math.round((sellPerUnitTWD - costPerUnitTWD) / sellPerUnitTWD * 100);
+}
+
+function calcDiscountMargin(r) {
+  if (!r.discountPrice || !r.hasDiscount || !r.sellPrice) return null;
+  const qty = parseFloat(r.qty) || 1;
+  const buyRate = rates[r.currency] || 1;
+  const sellRate = rates[r.sellCurrency] || 1;
+  const discCostTWD = parseFloat(r.discountPrice) * buyRate;
+  const shippingTWD = r.shippingInCost ? (parseFloat(r.shipping) || 0) * buyRate / qty : 0;
+  const costPerUnitTWD = discCostTWD + shippingTWD;
+  const sellPerUnitTWD = parseFloat(r.sellPrice) * sellRate;
+  if (sellPerUnitTWD === 0) return null;
+  return Math.round((sellPerUnitTWD - costPerUnitTWD) / sellPerUnitTWD * 100);
+}
+
+function calcMarginTWD(r) {
+  // Returns profit in TWD for summary
+  if (!r.price || !r.currency || !r.sellPrice) return null;
+  const qty = parseFloat(r.qty) || 1;
+  const costTWD = toTWD(r.price, r.currency) * qty;
+  const shippingCost = r.shippingInCost ? (parseFloat(r.shipping) || 0) * rates[r.currency] : 0;
+  const sellTWD = toTWD(r.sellPrice, r.currency) * qty;
+  return sellTWD - costTWD - shippingCost;
+}
+
+function updateMargin() {
+  const buyCur = document.getElementById('f-currency').value;
+  const sellCur = document.getElementById('f-sell-currency').value;
+  const price = parseFloat(document.getElementById('f-price').value);
+  const qty = parseFloat(document.getElementById('f-qty').value) || 1;
+  const sellPrice = parseFloat(document.getElementById('f-sell-price').value);
+  const shipping = parseFloat(document.getElementById('f-shipping').value) || 0;
+  const shippingInCost = document.getElementById('f-shipping-in-cost').checked;
+  const hasDiscount = document.getElementById('f-has-discount').checked;
+  const discountPrice = parseFloat(document.getElementById('f-discount-price').value);
+  const hint = document.getElementById('margin-hint');
+
+  // Update TWD hints for shipping and sell price
+  const shippingEl = document.getElementById('shipping-hint');
+  const sellEl = document.getElementById('sell-hint');
+  if (shippingEl) {
+    const shippingTwd = shipping && buyCur && buyCur !== 'TWD' ? Math.round(shipping * (rates[buyCur] || 1)) : null;
+    shippingEl.textContent = shippingTwd ? `≈ TWD ${shippingTwd.toLocaleString()}` : '';
+  }
+  if (sellEl) {
+    const sellTwd = sellPrice && sellCur && sellCur !== 'TWD' ? Math.round(sellPrice * (rates[sellCur] || 1)) : null;
+    sellEl.textContent = sellTwd ? `≈ TWD ${sellTwd.toLocaleString()}` : '';
+  }
+
+  if (!price || !sellPrice) { hint.innerHTML = ''; return; }
+
+  // Convert everything to TWD for cross-currency comparison
+  const buyRate = rates[buyCur] || 1;
+  const sellRate = rates[sellCur] || 1;
+  const shippingRate = rates[buyCur] || 1; // shipping in buy currency
+
+  const costTWD = price * buyRate;
+  const shippingTWD = shippingInCost ? (shipping / qty) * shippingRate : 0;
+  const costPerUnitTWD = costTWD + shippingTWD;
+  const sellPerUnitTWD = sellPrice * sellRate;
+
+  function marginLine(costTWDper, sellTWDper, buyCurLabel, sellCurLabel, label) {
+    if (!sellTWDper) return '';
+    const m = Math.round((sellTWDper - costTWDper) / sellTWDper * 100);
+    const profitPerUnit = sellTWDper - costTWDper;
+    const profitTotal = profitPerUnit * qty;
+    const cls = m >= 0 ? 'margin-positive' : 'margin-negative';
+    const sameRate = buyRate === sellRate;
+    return `<div style="margin-top:4px;line-height:1.6">`
+      + `${label}<span class="${cls}"><strong>${m}%</strong></span>`
+      + `<span style="opacity:0.6;font-size:11px"> /件</span>`
+      + `　獲利 TWD ${profitTotal.toLocaleString()}`
+      + `<br><span style="opacity:0.65;font-size:11px">`
+      + `成本 ${costTWDper.toFixed(0)} TWD／件 → 售 ${sellTWDper.toFixed(0)} TWD／件`
+      + `</span></div>`;
+  }
+
+  let html = marginLine(costPerUnitTWD, sellPerUnitTWD, buyCur, sellCur, '原價毛利　');
+  if (hasDiscount && discountPrice) {
+    const discCostTWD = discountPrice * buyRate + shippingTWD;
+    html += marginLine(discCostTWD, sellPerUnitTWD, buyCur, sellCur, '折後毛利　');
+  }
+
+  hint.className = 'calc-hint';
+  hint.innerHTML = html;
 }
 
 async function saveRecord() {
@@ -1128,18 +1596,24 @@ async function saveRecord() {
     name: document.getElementById('f-name').value,
     price: document.getElementById('f-price').value,
     currency: document.getElementById('f-currency').value,
+    country: document.getElementById('f-country').value,
     city: document.getElementById('f-city').value,
     store: document.getElementById('f-store').value,
     category: document.getElementById('f-category').value,
     type: document.getElementById('f-type').value,
     mode,
     note: document.getElementById('f-note').value,
+    qty: document.getElementById('f-qty').value,
+    sellPrice: document.getElementById('f-sell-price').value,
+    sellCurrency: document.getElementById('f-sell-currency').value,
+    shipping: document.getElementById('f-shipping').value,
+    shippingInCost: document.getElementById('f-shipping-in-cost').checked,
     hasDiscount: document.getElementById('f-has-discount').checked,
     discountPrice: document.getElementById('f-discount-price').value,
     discountNote: document.getElementById('f-discount-note').value,
     photo: photoData || (existingRec ? existingRec.photo : null),
     status: existingRec ? (existingRec.status || '') : '',
-    date: existingRec ? (existingRec.date || new Date().toLocaleDateString('zh-TW')) : new Date().toLocaleDateString('zh-TW'),
+    date: document.getElementById('f-date').value || new Date().toLocaleDateString('zh-TW'),
   };
 
   // Save to IndexedDB
@@ -1167,6 +1641,16 @@ function renderRecords() {
   else if (currentFilter === 'biz') filtered = filtered.filter(r => r.type === '業務');
   else if (currentFilter === 'personal') filtered = filtered.filter(r => r.type === '私人');
 
+  const cityVal = document.getElementById('filter-city')?.value || '';
+  const countryVal = document.getElementById('filter-country')?.value || '';
+  const storeVal = document.getElementById('filter-store')?.value || '';
+  if (cityVal) filtered = filtered.filter(r => r.city === cityVal);
+  if (countryVal) filtered = filtered.filter(r => (r.country || '') === countryVal);
+  if (storeVal) filtered = filtered.filter(r => (r.store || '') === storeVal);
+
+  filtered = applySort(filtered, 'records');
+  populateFilterDropdowns();
+
   if (!filtered.length) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">✦</div><div class="empty-text">暫無紀錄</div></div>`;
     return;
@@ -1176,7 +1660,18 @@ function renderRecords() {
 
 function renderCatalog() {
   const list = document.getElementById('catalog-list');
-  const items = records.filter(r => r.mode === '暫存目錄');
+  let items = records.filter(r => r.mode === '暫存目錄');
+
+  const cityVal = document.getElementById('filter-city-cat')?.value || '';
+  const countryVal = document.getElementById('filter-country-cat')?.value || '';
+  const storeVal = document.getElementById('filter-store-cat')?.value || '';
+  if (cityVal) items = items.filter(r => r.city === cityVal);
+  if (countryVal) items = items.filter(r => (r.country || '') === countryVal);
+  if (storeVal) items = items.filter(r => (r.store || '') === storeVal);
+
+  items = applySort(items, 'catalog');
+  populateFilterDropdowns();
+
   if (!items.length) {
     list.innerHTML = `<div class="empty-state"><div class="empty-icon">◇</div><div class="empty-text">詢價商品暫存於此</div></div>`;
     return;
@@ -1186,13 +1681,21 @@ function renderCatalog() {
 
 function recordCardHTML(r, isCatalog = false) {
   const twd = toTWD(r.price, r.currency);
-  const twdStr = twd && r.currency !== 'TWD' ? `<span class="record-price-twd">≈ TWD ${twd.toLocaleString()}</span>` : '';
-  const priceStr = r.price ? `${r.price}${r.currency ? ' ' + r.currency : ''}` : '—';
+  const cur = r.currency || '';
+  const sellCur = r.sellCurrency || cur;
+  const twdStr = twd && cur !== 'TWD' ? ` <span class="record-price-twd">≈ TWD ${twd.toLocaleString()}</span>` : '';
+  const discTwd = r.hasDiscount && r.discountPrice && cur !== 'TWD'
+    ? Math.round(parseFloat(r.discountPrice) * (rates[cur] || 1)) : null;
+  const discStr = r.hasDiscount && r.discountPrice
+    ? ` <span style="opacity:0.5;font-size:11px">→ 折</span> <span style="color:var(--gold)">${r.discountPrice} ${cur}${discTwd ? ` <span class="record-price-twd">≈ TWD ${discTwd.toLocaleString()}</span>` : ''}</span>`
+    : '';
+  const priceStr = r.price ? `<span style="opacity:0.55;font-size:11px">買</span> ${r.price} ${cur}${twdStr}${discStr}` : '—';
+  const margin = calcMargin(r);
+  const discMargin = calcDiscountMargin(r);
+
   const thumb = r.photo
-    ? `<div class="record-thumb"><img src="${r.photo}"></div>`
-    : `<div class="record-thumb">◻</div>`;
-
-
+    ? `<div class="thumb-wrap"><div class="record-thumb"><img src="${r.photo}"></div></div>`
+    : `<div class="thumb-wrap"><div class="record-thumb">◻</div></div>`;
 
   const inlineStatus = !isCatalog ? `
     <div class="card-status-row">
@@ -1201,20 +1704,27 @@ function recordCardHTML(r, isCatalog = false) {
       <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="setStatus('${r.id}','pass',this)">放棄</button>
     </div>` : '';
 
+  const bizLine = r.qty ? `
+    <div class="record-biz-line">
+      <span>×${r.qty} 件</span>
+    </div>` : '';
+
   return `<div class="record-card" id="card-${r.id}">
     <div class="record-top">
       ${thumb}
       <div class="record-body">
         <div class="record-name">${r.name || '（未命名）'}</div>
-        <div class="record-meta">${[r.city, r.store].filter(Boolean).join(' · ') || ''} ${r.date ? '· ' + r.date : ''}</div>
-        <div class="record-price">${priceStr}${twdStr}</div>
+        <div class="record-meta">${[r.country, r.city, r.store].filter(Boolean).join(' · ') || ''}${r.date ? ' · ' + r.date : ''}</div>
+        <div class="record-price">${priceStr}</div>
+        ${bizLine}
         ${inlineStatus}
       </div>
     </div>
     <div class="record-tags">
       ${r.category ? `<span class="tag tag-cat">${r.category}</span>` : ''}
       ${r.type === '業務' ? `<span class="tag tag-biz">業務</span>` : r.type === '私人' ? `<span class="tag tag-personal">私人</span>` : ''}
-      ${r.hasDiscount ? `<span class="tag tag-discount">折扣${r.discountPrice ? ' ' + r.discountPrice : ''}</span>` : ''}
+      ${r.hasDiscount ? `<span class="tag tag-discount">折扣${r.discountPrice ? ' ' + r.discountPrice + (r.currency ? ' ' + r.currency : '') : ''}</span>` : ''}
+      ${r.note ? `<span class="tag tag-note">${r.note}</span>` : ''}
       ${isCatalog ? `<span class="tag tag-catalog">目錄</span>` : ''}
     </div>
     <div class="record-bottom">
@@ -1259,6 +1769,57 @@ async function convertCatalog(id) {
   renderCatalog();
   renderRecords();
   toast('已移至採購紀錄');
+}
+
+function toggleSortDir(page) {
+  sortDirs[page] = sortDirs[page] === 'desc' ? 'asc' : 'desc';
+  const btn = document.getElementById('sort-dir-' + page);
+  if (btn) { btn.className = 'sort-dir ' + sortDirs[page]; }
+  if (page === 'records') renderRecords();
+  else renderCatalog();
+}
+
+function getSortValue(r, field) {
+  const buyRate = rates[r.currency] || 1;
+  switch(field) {
+    case 'price': return (parseFloat(r.price) || 0) * buyRate;
+    case 'margin': return calcMargin(r) ?? -999;
+    case 'qty': return parseFloat(r.qty) || 0;
+    case 'shipping': return (parseFloat(r.shipping) || 0) * buyRate;
+    case 'date': default: return r.id || '0';
+  }
+}
+
+function applySort(list, pageId) {
+  const field = document.getElementById('sort-field-' + pageId)?.value || 'date';
+  const dir = sortDirs[pageId] || 'desc';
+  return [...list].sort((a, b) => {
+    const va = getSortValue(a, field);
+    const vb = getSortValue(b, field);
+    if (va < vb) return dir === 'asc' ? -1 : 1;
+    if (va > vb) return dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+}
+
+function populateFilterDropdowns() {
+  const cities    = [...new Set(records.map(r => r.city).filter(Boolean))].sort();
+  const countries = [...new Set(records.map(r => r.country).filter(Boolean))].sort();
+  const stores    = [...new Set(records.map(r => r.store).filter(Boolean))].sort();
+
+  const fill = (id, label, list) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cur = el.value;
+    el.innerHTML = `<option value="">${label}</option>`
+      + list.map(v => `<option value="${v}" ${v===cur?'selected':''}>${v}</option>`).join('');
+  };
+  fill('filter-city',        '所有城市', cities);
+  fill('filter-city-cat',    '所有城市', cities);
+  fill('filter-country',     '所有國家', countries);
+  fill('filter-country-cat', '所有國家', countries);
+  fill('filter-store',       '所有店名', stores);
+  fill('filter-store-cat',   '所有店名', stores);
 }
 
 function setFilter(filter, btn) {
@@ -1405,11 +1966,11 @@ function exportCSV(type) {
   if (type === 'biz') { data = data.filter(r => r.type === '業務'); filename = '業務採購'; }
   if (type === 'personal') { data = data.filter(r => r.type === '私人'); filename = '私人採購'; }
 
-  const headers = ['日期','商品名稱','價格','幣別','折合台幣','城市/店名','分類','用途','狀態','有折扣','折後價','折扣備註','備註'];
+  const headers = ['日期','商品名稱','數量','採購價','幣別','採購價(TWD)','售價(TWD)','毛利率(%)','運費(TWD)','城市','店名','分類','用途','狀態','有折扣','折後價','折扣備註','備註'];
   const rows = data.map(r => [
-    r.date || '', r.name || '', r.price || '', r.currency || '',
-    toTWD(r.price, r.currency) || '',
-    r.location || '', r.category || '', r.type || '', r.status || '',
+    r.date || '', r.name || '', r.qty || '', r.price || '', r.currency || '',
+    toTWD(r.price, r.currency) || '', r.sellPrice || '', calcMargin(r) !== null ? calcMargin(r) : '',
+    r.shipping || '', r.city || '', r.store || '', r.category || '', r.type || '', r.status || '',
     r.hasDiscount ? '是' : '否', r.discountPrice || '', r.discountNote || '', r.note || ''
   ]);
 
@@ -1423,6 +1984,132 @@ function exportCSV(type) {
   a.click();
   URL.revokeObjectURL(url);
   toast('CSV 匯出完成');
+}
+
+async function exportExcel(type) {
+  // Load SheetJS if not already loaded
+  if (!window.XLSX) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+
+  let data = records.filter(r => r.mode !== '暫存目錄');
+  let filename = '採購紀錄';
+  if (type === 'biz') { data = data.filter(r => r.type === '業務'); filename = '業務採購'; }
+  if (type === 'personal') { data = data.filter(r => r.type === '私人'); filename = '私人採購'; }
+
+  toast('準備匯出中...');
+
+  const wb = XLSX.utils.book_new();
+  const wsData = [
+    ['日期','商品名稱','照片','數量','採購價','幣別','採購價(TWD)','售價(TWD)','毛利率(%)','運費(TWD)','城市','店名','分類','用途','狀態','有折扣','折後價','折扣備註','備註']
+  ];
+
+  for (const r of data) {
+    wsData.push([
+      r.date || '', r.name || '', r.photo ? '(見圖)' : '', r.qty || '',
+      r.price || '', r.currency || '', toTWD(r.price, r.currency) || '',
+      r.sellPrice || '', calcMargin(r) !== null ? calcMargin(r) : '',
+      r.shipping || '', r.city || '', r.store || '', r.category || '',
+      r.type || '', r.status || '',
+      r.hasDiscount ? '是' : '否', r.discountPrice || '', r.discountNote || '', r.note || ''
+    ]);
+  }
+
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Set column widths
+  ws['!cols'] = [
+    {wch:10},{wch:20},{wch:12},{wch:6},{wch:10},{wch:6},{wch:12},{wch:12},{wch:8},
+    {wch:10},{wch:10},{wch:16},{wch:10},{wch:6},{wch:6},{wch:6},{wch:10},{wch:16},{wch:30}
+  ];
+
+  // Embed photos as images using row height + drawingml approach
+  // We'll use a simpler approach: convert photos to base64 and add as separate sheet
+  const photoRecs = data.filter(r => r.photo);
+  if (photoRecs.length > 0) {
+    // Add photos to a second sheet as references
+    const photoData2 = [['商品名稱', '日期', '城市', '店名', '價格', '備註', '照片 (Base64 預覽)']];
+    for (const r of photoRecs) {
+      let b64 = '';
+      try {
+        // Convert blob URL to base64
+        const resp = await fetch(r.photo);
+        const blob = await resp.blob();
+        b64 = await new Promise(res => {
+          const reader = new FileReader();
+          reader.onload = e => res(e.target.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch(e) { b64 = r.photo || ''; }
+      photoData2.push([r.name || '(未命名)', r.date || '', r.city || '', r.store || '',
+        (r.price || '') + ' ' + (r.currency || ''), r.note || '', b64.substring(0, 100) + '...']);
+    }
+    const ws2 = XLSX.utils.aoa_to_sheet(photoData2);
+    XLSX.utils.book_append_sheet(wb, ws2, '照片清單');
+
+    // Also create an HTML file with embedded photos for download
+    let htmlContent = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${filename} 照片總覽</title>
+<style>
+body{font-family:sans-serif;background:#f5f0e8;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.card{background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.card img{width:100%;height:160px;object-fit:cover}
+.card-info{padding:10px;font-size:12px}
+.card-name{font-weight:bold;margin-bottom:4px}
+.card-meta{color:#888}
+</style></head><body>
+<h2 style="color:#2a2218;letter-spacing:3px;margin-bottom:20px">${filename} · 照片總覽</h2>
+<div class="grid">`;
+
+    for (const r of photoRecs) {
+      let b64 = r.photo;
+      try {
+        const resp = await fetch(r.photo);
+        const blob = await resp.blob();
+        b64 = await new Promise(res => {
+          const reader = new FileReader();
+          reader.onload = e => res(e.target.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch(e) {}
+      htmlContent += `<div class="card">
+        <img src="${b64}" alt="${r.name || ''}">
+        <div class="card-info">
+          <div class="card-name">${r.name || '(未命名)'}</div>
+          <div class="card-meta">${r.price ? r.price + ' ' + (r.currency||'') : ''} ${r.city ? '· ' + r.city : ''} ${r.store ? r.store : ''}</div>
+          <div class="card-meta">${r.note || ''}</div>
+        </div>
+      </div>`;
+    }
+    htmlContent += `</div></body></html>`;
+
+    // Download photo HTML
+    const htmlBlob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'});
+    const htmlUrl = URL.createObjectURL(htmlBlob);
+    const ha = document.createElement('a');
+    ha.href = htmlUrl;
+    ha.download = `${filename}_照片_${new Date().toLocaleDateString('zh-TW').replace(/\//g,'-')}.html`;
+    ha.click();
+    URL.revokeObjectURL(htmlUrl);
+  }
+
+  XLSX.utils.book_append_sheet(wb, ws, '採購紀錄');
+  const dateStr = new Date().toLocaleDateString('zh-TW').replace(/\//g,'-');
+  XLSX.write(wb, {bookType:'xlsx', type:'array'});
+  const xlsxBlob = new Blob([XLSX.write(wb, {bookType:'xlsx', type:'array'})], {type:'application/octet-stream'});
+  const url = URL.createObjectURL(xlsxBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}_${dateStr}.xlsx`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Excel 匯出完成！照片另存為 HTML 檔');
 }
 
 async function clearAll() {
