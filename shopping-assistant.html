@@ -88,8 +88,8 @@
   }
   .tab {
     padding: 10px 18px;
-    font-size: 11px;
-    letter-spacing: 2.5px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
     color: var(--light);
     cursor: pointer;
     border-bottom: 2px solid transparent;
@@ -386,44 +386,160 @@
   }
   .record-thumb img { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; }
 
-  .record-body { flex: 1; min-width: 0; }
-  .record-name {
-    font-size: 14px;
+  /* ── Card redesign ── */
+  .card-header {
+    display: flex;
+    gap: 12px;
+    padding: 12px 12px 8px;
+    align-items: flex-start;
+  }
+  .card-thumb {
+    width: 64px;
+    height: 64px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: var(--cream);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: var(--divider);
+  }
+  .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .card-thumb-empty { border: 1px dashed var(--divider); }
+  .card-header-info { flex: 1; min-width: 0; }
+  .card-name {
+    font-size: 15px;
+    font-weight: 500;
     color: var(--dark);
-    margin-bottom: 3px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .record-meta {
-    font-size: 12px;
-    color: var(--light);
-    letter-spacing: 0.5px;
     margin-bottom: 4px;
   }
-  .record-price {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 17px;
-    color: var(--dark);
-    margin-bottom: 3px;
+  .card-meta {
+    font-size: 11px;
+    color: var(--light);
+    letter-spacing: 0.3px;
   }
-  .record-price-twd {
-    font-size: 12px;
+  .card-body {
+    padding: 0 12px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    border-bottom: 1px solid var(--divider);
+  }
+  /* card data rows — label col fixed width for alignment */
+  .card-data-grid {
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    align-items: baseline;
+    gap: 4px 6px;
+    font-size: 13px;
+  }
+  .card-lbl {
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--light);
+    text-align: right;
+  }
+  .card-val { color: var(--dark); }
+  .card-val-strike { color: var(--light); text-decoration: line-through; font-size: 12px; }
+  .card-disc-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    color: var(--dark);
+    line-height: 1;
+  }
+  .card-twd {
+    font-size: 11px;
     color: var(--gold);
+    margin-left: 5px;
+  }
+  .card-short {
+    display: inline-block;
+    background: var(--status-pass);
+    color: white;
+    font-size: 10px;
+    padding: 1px 7px;
+    border-radius: 10px;
     margin-left: 4px;
   }
-  .record-biz-line {
-    font-size: 12px;
-    color: var(--light);
+  .card-margin-pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 10px;
+    border: 1px solid currentColor;
+    margin-top: 2px;
+  }
+  /* info box: name + tags + note */
+  .card-info-box {
+    margin: 0 12px 8px;
+    background: var(--cream);
+    border-radius: 4px;
+    padding: 8px 10px;
     display: flex;
-    gap: 8px;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .card-tags-row {
+    display: flex;
+    gap: 4px;
     flex-wrap: wrap;
-    margin-bottom: 4px;
   }
-  .thumb-wrap {
+  /* status row */
+  .card-status-bar {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    border-top: 1px solid var(--divider);
+  }
+  .card-status-bar .status-btn { flex: 1; text-align: center; }
+  /* top-right edit/delete */
+  .card-top-actions {
+    display: flex;
+    gap: 4px;
+    align-items: flex-start;
+    margin-left: auto;
     flex-shrink: 0;
-    text-align: center;
   }
+  .btn-edit-icon, .btn-del-icon {
+    background: var(--warm-white);
+    border: 1px solid var(--divider);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    font-family: 'Noto Serif TC', serif;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    height: 28px;
+    display: flex;
+    align-items: center;
+  }
+  .btn-edit-icon { color: var(--mid); }
+  .btn-edit-icon:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-del-icon { color: var(--status-pass); }
+  .btn-del-icon:hover { background: var(--status-pass); color: white; border-color: var(--status-pass); }
+  .card-footer-actions {
+    border-top: 1px solid var(--divider);
+    padding: 6px 12px;
+    display: flex;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  /* legacy compat */
+  .record-body { flex: 1; min-width: 0; }
+  .record-name { font-size: 14px; color: var(--dark); margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .record-meta { font-size: 12px; color: var(--light); letter-spacing: 0.5px; margin-bottom: 4px; }
+  .record-price { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--dark); margin-bottom: 3px; }
+  .record-price-twd { font-size: 12px; color: var(--gold); margin-left: 4px; }
+  .record-biz-line { font-size: 12px; color: var(--light); display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .thumb-wrap { flex-shrink: 0; text-align: center; }
 
   .record-tags {
     display: flex;
@@ -788,6 +904,10 @@
 <!-- Summary page -->
 <div id="page-summary" class="page">
   <div class="summary-section" id="summary-content"></div>
+  <div style="padding:0 16px 16px">
+    <button onclick="debugInventory()" style="font-size:11px;color:var(--light);background:none;border:1px dashed var(--divider);padding:4px 10px;border-radius:4px;cursor:pointer;font-family:inherit">診斷庫存壓力</button>
+    <div id="debug-inv" style="font-size:11px;color:var(--mid);margin-top:6px;line-height:1.8;white-space:pre-wrap"></div>
+  </div>
 </div>
 
 <!-- Settings page -->
@@ -1113,9 +1233,15 @@
 
     <!-- Business fields -->
     <div class="form-section">
-      <label class="form-label" id="sell-price-label">數量 / 售價</label>
+      <label class="form-label">數量</label>
       <div class="form-row">
-        <input type="number" class="form-input" id="f-qty" placeholder="數量（選填）" min="1" oninput="updateMargin()">
+        <input type="number" class="form-input" id="f-qty" placeholder="採購數量" min="1" oninput="updateMargin()">
+        <input type="number" class="form-input" id="f-demand-qty" placeholder="需求數量（選填）" min="1">
+      </div>
+    </div>
+    <div class="form-section">
+      <label class="form-label" id="sell-price-label">售價</label>
+      <div class="form-row">
         <div class="price-wrap">
           <input type="number" class="form-input" id="f-sell-price" placeholder="售價（選填）" oninput="updateMargin()">
           <span class="price-hint" id="sell-hint"></span>
@@ -1364,6 +1490,9 @@ function switchTab(tab) {
   });
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + tab).classList.add('active');
+  // Hide FAB on summary and settings
+  const fab = document.querySelector('.fab');
+  if (fab) fab.style.display = (tab === 'summary' || tab === 'settings') ? 'none' : '';
   if (tab === 'summary') renderSummary();
   if (tab === 'catalog') renderCatalog();
   if (tab === 'records') renderRecords();
@@ -1387,6 +1516,7 @@ function openAddModal(editId = null) {
     document.getElementById('f-mode').value = rec.mode || '採購紀錄';
     document.getElementById('f-note').value = rec.note || '';
     document.getElementById('f-qty').value = rec.qty || '';
+    document.getElementById('f-demand-qty').value = rec.demandQty || '';
     document.getElementById('f-sell-price').value = rec.sellPrice || '';
     document.getElementById('f-sell-currency').value = rec.sellCurrency || '';
     document.getElementById('f-shipping').value = rec.shipping || '';
@@ -1441,7 +1571,7 @@ function restoreToggle(groupId, value) {
 }
 
 function clearForm() {
-  ['f-name','f-price','f-currency','f-city','f-store','f-category','f-type','f-note','f-edit-id','f-discount-price','f-discount-note','f-qty','f-sell-price','f-shipping','f-date'].forEach(id => {
+  ['f-name','f-price','f-currency','f-city','f-store','f-category','f-type','f-note','f-edit-id','f-discount-price','f-discount-note','f-qty','f-demand-qty','f-sell-price','f-shipping','f-date'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1494,7 +1624,7 @@ function updateTwdHint() {
   const price = document.getElementById('f-price').value;
   const cur = document.getElementById('f-currency').value;
   const twd = toTWD(price, cur);
-  document.getElementById('twd-hint').textContent = twd && cur !== 'TWD' ? `≈ TWD ${twd.toLocaleString()}` : '';
+  document.getElementById('twd-hint').textContent = twd && cur !== 'TWD' ? `≈ NT$${twd.toLocaleString()}` : '';
   // Update labels and hints when buy currency changes
   const curLabel = cur || 'TWD';
   const shipLabel = document.getElementById('shipping-label');
@@ -1508,7 +1638,7 @@ function updateDiscountHint() {
   const price = document.getElementById('f-discount-price').value;
   const cur = document.getElementById('f-currency').value;
   const twd = toTWD(price, cur);
-  document.getElementById('discount-hint').textContent = twd && cur !== 'TWD' ? `≈ TWD ${twd.toLocaleString()}` : '';
+  document.getElementById('discount-hint').textContent = twd && cur !== 'TWD' ? `≈ NT$${twd.toLocaleString()}` : '';
 }
 
 function calcMargin(r) {
@@ -1564,11 +1694,11 @@ function updateMargin() {
   const sellEl = document.getElementById('sell-hint');
   if (shippingEl) {
     const shippingTwd = shipping && buyCur && buyCur !== 'TWD' ? Math.round(shipping * (rates[buyCur] || 1)) : null;
-    shippingEl.textContent = shippingTwd ? `≈ TWD ${shippingTwd.toLocaleString()}` : '';
+    shippingEl.textContent = shippingTwd ? `≈ NT$${shippingTwd.toLocaleString()}` : '';
   }
   if (sellEl) {
     const sellTwd = sellPrice && sellCur && sellCur !== 'TWD' ? Math.round(sellPrice * (rates[sellCur] || 1)) : null;
-    sellEl.textContent = sellTwd ? `≈ TWD ${sellTwd.toLocaleString()}` : '';
+    sellEl.textContent = sellTwd ? `≈ NT$${sellTwd.toLocaleString()}` : '';
   }
 
   if (!price || !sellPrice) { hint.innerHTML = ''; return; }
@@ -1592,7 +1722,7 @@ function updateMargin() {
     const sameRate = buyRate === sellRate;
     return `<div style="margin-top:4px;line-height:1.6">`
       + `${label}<span class="${cls}"><strong>${m}%</strong></span>`
-      + `　獲利 <span class="${cls}">TWD ${profitPerUnit.toFixed(0)}</span><span style="opacity:0.6;font-size:11px"> /件</span>`
+      + `　獲利 <span class="${cls}">NT$${Math.round(profitPerUnit).toLocaleString()}</span><span style="opacity:0.6;font-size:11px"> /件</span>`
       + `</div>`;
   }
 
@@ -1625,6 +1755,7 @@ async function saveRecord() {
     mode,
     note: document.getElementById('f-note').value,
     qty: document.getElementById('f-qty').value,
+    demandQty: document.getElementById('f-demand-qty').value,
     sellPrice: document.getElementById('f-sell-price').value,
     sellCurrency: document.getElementById('f-sell-currency').value,
     shipping: document.getElementById('f-shipping').value,
@@ -1700,71 +1831,146 @@ function renderCatalog() {
   list.innerHTML = items.map(r => recordCardHTML(r, true)).join('');
 }
 
+function curSymbol(c) {
+  const map = { EUR: '€', RMB: '¥', JPY: '¥', KRW: '₩', USD: '$', TWD: 'NT$' };
+  return map[c] || c;
+}
+function fmtPrice(val, cur) {
+  if (!val || !cur) return '';
+  const sym = curSymbol(cur);
+  const n = parseFloat(val);
+  // JPY/KRW: no decimals
+  const str = (cur === 'JPY' || cur === 'KRW')
+    ? Math.round(n).toLocaleString()
+    : n.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:2});
+  return sym + str;
+}
+function fmtTWD(val, cur) {
+  if (!val || !cur || cur === 'TWD') return '';
+  const twd = toTWD(val, cur);
+  if (!twd) return '';
+  return `≈ NT$${twd.toLocaleString()}`;
+}
+
 function recordCardHTML(r, isCatalog = false) {
-  const twd = toTWD(r.price, r.currency);
   const cur = r.currency || '';
   const sellCur = r.sellCurrency || cur;
-  const twdStr = twd && cur !== 'TWD' ? ` <span class="record-price-twd">≈ TWD ${twd.toLocaleString()}</span>` : '';
-  const discTwd = r.hasDiscount && r.discountPrice && cur !== 'TWD'
-    ? Math.round(parseFloat(r.discountPrice) * (rates[cur] || 1)) : null;
-  const discLine = r.hasDiscount && r.discountPrice
-    ? `<div style="font-size:12px;margin-top:2px"><span style="opacity:0.5">折</span> <span style="color:var(--gold)">${r.discountPrice} ${cur}${discTwd ? ` <span class="record-price-twd">≈ TWD ${discTwd.toLocaleString()}</span>` : ''}</span></div>`
-    : '';
-  const priceStr = r.price ? `<span style="opacity:0.55;font-size:11px">買</span> ${r.price} ${cur}${twdStr}` : '—';
   const margin = calcMargin(r);
   const discMargin = calcDiscountMargin(r);
+  const activeMargin = discMargin !== null ? discMargin : margin;
+  const marginCls = activeMargin !== null ? (activeMargin >= 0 ? 'margin-positive' : 'margin-negative') : '';
+
+  // Demand qty
+  const qty = parseFloat(r.qty) || 0;
+  const demandQty = parseFloat(r.demandQty) || 0;
+  const short = demandQty > 0 && qty < demandQty ? demandQty - qty : 0;
+
+  // Price lines
+  const hasDisc = r.hasDiscount && r.discountPrice;
+  const costPrice = hasDisc ? r.discountPrice : r.price; // effective cost
+
+  const buyLine = r.price ? `
+    <div class="card-buy-line ${hasDisc ? 'card-buy-strikethrough' : ''}">
+      <span class="card-buy-label">買</span>
+      <span>${fmtPrice(r.price, cur)}</span>
+      <span class="card-twd">${fmtTWD(r.price, cur)}</span>
+    </div>` : '';
+
+  const discPriceLine = hasDisc ? `
+    <div class="card-disc-line">
+      <span class="card-disc-label">折</span>
+      <span class="card-disc-price">${fmtPrice(r.discountPrice, cur)}</span>
+      <span class="card-twd">${fmtTWD(r.discountPrice, cur)}</span>
+    </div>` : '';
+
+  const qtyLine = (qty || demandQty) ? `
+    <div class="card-qty-line">
+      <span class="card-qty-label">採購量</span>
+      <span>${qty || '—'} 件${demandQty ? ' / ' + demandQty + ' 件' : ''}</span>
+      ${short ? `<span class="card-short">還差 ${short} 件</span>` : ''}
+    </div>` : '';
+
+  const sellMarginLine = (r.sellPrice || activeMargin !== null) ? `
+    <div class="card-sell-line">
+      ${r.sellPrice ? `<span><span class="card-sell-label">售</span> ${fmtPrice(r.sellPrice, sellCur)}</span>` : ''}
+      ${activeMargin !== null ? `<span class="card-margin-pill ${marginCls}">毛利 ${activeMargin}%</span>` : ''}
+    </div>` : '';
 
   const thumb = r.photo
-    ? `<div class="thumb-wrap"><div class="record-thumb"><img src="${r.photo}"></div></div>`
-    : `<div class="thumb-wrap"><div class="record-thumb">◻</div></div>`;
+    ? `<div class="card-thumb"><img src="${r.photo}" alt=""></div>`
+    : `<div class="card-thumb card-thumb-empty">◻</div>`;
 
-  const inlineStatus = !isCatalog ? `
+  const statusBtns = !isCatalog ? `
     <div class="card-status-row">
       <button class="status-btn s-buy ${r.status==='buy'?'active':''}" onclick="setStatus('${r.id}','buy',this)">要買</button>
       <button class="status-btn s-bought ${r.status==='bought'?'active':''}" onclick="setStatus('${r.id}','bought',this)">已買</button>
       <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="setStatus('${r.id}','pass',this)">放棄</button>
     </div>` : '';
 
-  const marginDisplay = discMargin !== null
-    ? `<span class="${discMargin >= 0 ? 'margin-positive' : 'margin-negative'}">${discMargin}%</span>`
-    : margin !== null
-      ? `<span class="${margin >= 0 ? 'margin-positive' : 'margin-negative'}">${margin}%</span>`
-      : '';
-  const bizLine = (r.qty || r.sellPrice || margin !== null) ? `
-    <div class="record-biz-line">
-      ${r.qty ? `<span>×${r.qty} 件</span>` : ''}
-      ${r.sellPrice ? `<span>售 ${parseFloat(r.sellPrice).toLocaleString()} ${r.sellCurrency || cur}</span>` : ''}
-      ${marginDisplay ? `<span>毛利 ${marginDisplay}</span>` : ''}
-    </div>` : '';
+  // info box: name + tags + note
+  const tagsInner = [
+    r.category ? `<span class="tag tag-cat">${r.category}</span>` : '',
+    r.type === '業務' ? `<span class="tag tag-biz">業務</span>` : r.type === '私人' ? `<span class="tag tag-personal">私人</span>` : '',
+    r.hasDiscount ? `<span class="tag tag-discount">有折扣</span>` : '',
+    isCatalog ? `<span class="tag tag-catalog">目錄</span>` : '',
+  ].filter(Boolean).join('');
+
+  const infoBox = `
+    <div class="card-info-box">
+      <div class="card-name">${r.name || '（未命名）'}</div>
+      ${tagsInner ? `<div class="card-tags-row">${tagsInner}</div>` : ''}
+      ${r.note ? `<div style="font-size:11px;color:var(--light);font-style:italic">${r.note}</div>` : ''}
+    </div>`;
+
+  // data grid rows: 3-col (label | value | twd)
+  const twd_buy = fmtTWD(r.price, cur);
+  const twd_disc = hasDisc ? fmtTWD(r.discountPrice, cur) : '';
+  const twd_sell = r.sellPrice ? fmtTWD(r.sellPrice, sellCur) : '';
+
+  const buyRow = r.price ? `
+    <div class="card-lbl">買</div>
+    <div class="${hasDisc ? 'card-val-strike' : 'card-val'}">${fmtPrice(r.price, cur)}${twd_buy ? `<span class="card-twd">${twd_buy}</span>` : ''}</div>` : '';
+
+  const discRow = hasDisc ? `
+    <div class="card-lbl">折</div>
+    <div class="card-disc-val">${fmtPrice(r.discountPrice, cur)}${twd_disc ? `<span class="card-twd" style="font-size:12px">${twd_disc}</span>` : ''}</div>` : '';
+
+  const buyQtyRow = qty ? `
+    <div class="card-lbl">量</div>
+    <div class="card-val" style="color:var(--mid)">${qty} 件${short ? `<span class="card-short">還差 ${short} 件</span>` : ''}</div>` : '';
+
+  const sellRow = r.sellPrice ? `
+    <div class="card-lbl">售</div>
+    <div class="card-val">${fmtPrice(r.sellPrice, sellCur)}${twd_sell ? `<span class="card-twd">${twd_sell}</span>` : ''}</div>` : '';
+
+  const marginRow = activeMargin !== null ? `
+    <div class="card-lbl"></div>
+    <div><span class="card-margin-pill ${marginCls}">毛利 ${activeMargin}%</span></div>` : '';
+
+  const hasGrid = r.price || r.sellPrice || qty;
 
   return `<div class="record-card" id="card-${r.id}">
-    <div class="record-top">
+    <div class="card-header">
       ${thumb}
-      <div class="record-body">
-        <div class="record-name">${r.name || '（未命名）'}</div>
-        <div class="record-meta">${[r.country, r.city, r.store].filter(Boolean).join(' · ') || ''}${r.date ? ' · ' + r.date : ''}</div>
-        <div class="record-price">${priceStr}</div>
-        ${discLine}
-        ${bizLine}
-        ${inlineStatus}
+      <div class="card-header-info">
+        <div class="card-meta" style="margin-top:4px">${[r.country, r.city].filter(Boolean).join('・') || ''}${r.date ? '　' + r.date : ''}</div>
+      </div>
+      <div class="card-top-actions">
+        <button class="btn-edit-icon" onclick="openAddModal('${r.id}')" title="編輯">✎</button>
+        <button class="btn-del-icon" onclick="deleteRecord('${r.id}')">刪</button>
       </div>
     </div>
-    <div class="record-tags">
-      ${r.category ? `<span class="tag tag-cat">${r.category}</span>` : ''}
-      ${r.type === '業務' ? `<span class="tag tag-biz">業務</span>` : r.type === '私人' ? `<span class="tag tag-personal">私人</span>` : ''}
-      ${r.hasDiscount ? `<span class="tag tag-discount">折扣${r.discountPrice ? ' ' + r.discountPrice + (r.currency ? ' ' + r.currency : '') : ''}</span>` : ''}
-      ${r.note ? `<span class="tag tag-note">${r.note}</span>` : ''}
-      ${isCatalog ? `<span class="tag tag-catalog">目錄</span>` : ''}
-    </div>
-    <div class="record-bottom">
-      ${isCatalog ? `
-        <button class="rec-btn catalog-convert-btn" onclick="convertCatalog('${r.id}')">→ 採購</button>
-        <button class="rec-btn danger" onclick="deleteRecord('${r.id}')">刪</button>` : ''}
-      <div class="record-action-btns" style="${isCatalog?'':'margin-left:auto'}">
-        <button class="rec-btn" onclick="openAddModal('${r.id}')">編輯</button>
-        ${!isCatalog ? `<button class="rec-btn danger" onclick="deleteRecord('${r.id}')">刪</button>` : ''}
-      </div>
-    </div>
+    ${infoBox}
+    ${hasGrid ? `<div class="card-body"><div class="card-data-grid">${buyRow}${discRow}${buyQtyRow}${sellRow}${marginRow}</div></div>` : ''}
+    ${!isCatalog ? `
+    <div class="card-status-bar">
+      <button class="status-btn s-buy ${r.status==='buy'?'active':''}" onclick="setStatus('${r.id}','buy',this)">要買</button>
+      <button class="status-btn s-bought ${r.status==='bought'?'active':''}" onclick="setStatus('${r.id}','bought',this)">已買</button>
+      <button class="status-btn s-pass ${r.status==='pass'?'active':''}" onclick="setStatus('${r.id}','pass',this)">放棄</button>
+    </div>` : `
+    <div class="card-footer-actions">
+      <button class="rec-btn catalog-convert-btn" onclick="convertCatalog('${r.id}')">→ 採購</button>
+    </div>`}
   </div>`;
 }
 
@@ -1858,9 +2064,27 @@ function setFilter(filter, btn) {
   renderRecords();
 }
 
+function debugInventory() {
+  const recs = records.filter(r => r.mode !== '暫存目錄');
+  const el = document.getElementById('debug-inv');
+  let out = `全部紀錄: ${recs.length} 筆\n`;
+  out += `業務紀錄: ${recs.filter(r=>r.type==='業務').length} 筆\n`;
+  out += `業務已買: ${recs.filter(r=>r.type==='業務'&&r.status==='bought').length} 筆\n\n`;
+  recs.filter(r=>r.type==='業務'&&r.status==='bought').forEach(r => {
+    const bought = parseFloat(r.qty)||0;
+    const demand = parseFloat(r.demandQty)||0;
+    out += `── ${r.name||'未命名'}\n`;
+    out += `   qty="${r.qty}" demandQty="${r.demandQty}"  bought=${bought} demand=${demand}\n`;
+    out += `   passed=${bought>0&&demand>0&&bought>demand} → excess=${bought-demand}\n`;
+  });
+  el.textContent = out || '（無業務已買紀錄）';
+}
+
 function renderSummary() {
   const recs = records.filter(r => r.mode !== '暫存目錄');
-  const bizRecs = recs.filter(r => r.type === '業務' && r.price && r.currency);
+
+  // 全部業務 / 全部私人（不管狀態）
+  const bizRecs      = recs.filter(r => r.type === '業務' && r.price && r.currency);
   const personalRecs = recs.filter(r => r.type === '私人' && r.price && r.currency);
 
   function calcTotal(arr) {
@@ -1874,16 +2098,20 @@ function renderSummary() {
     return { byCur, twd };
   }
 
-  const bizTotal = calcTotal(bizRecs);
+  const bizTotal      = calcTotal(bizRecs);
   const personalTotal = calcTotal(personalRecs);
-  const allTotal = calcTotal(recs.filter(r => r.price && r.currency));
+
+  // 合計 = 業務已買 + 私人已買
+  const bizBoughtTWD      = calcTotal(bizRecs.filter(r => r.status === 'bought')).twd;
+  const personalBoughtTWD = calcTotal(personalRecs.filter(r => r.status === 'bought')).twd;
+  const grandTWD          = bizBoughtTWD + personalBoughtTWD;
 
   function renderBlock(title, data, count) {
     const curRows = Object.entries(data.byCur).map(([c, v]) => {
-      const twdEq = c !== 'TWD' ? ` <span style="font-size:11px;color:var(--gold);font-style:italic">≈ TWD ${Math.round(v * rates[c]).toLocaleString()}</span>` : '';
+      const twdEq = c !== 'TWD' ? ` <span style="font-size:11px;color:var(--gold)">≈ NT$${Math.round(v * (rates[c]||1)).toLocaleString()}</span>` : '';
       return `<div class="summary-row">
-        <span>${c}</span>
-        <span class="summary-amount">${v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})} ${c}${twdEq}</span>
+        <span>${curSymbol(c)}${c==='JPY'||c==='KRW' ? Math.round(v).toLocaleString() : v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2})}</span>
+        <span class="summary-amount" style="font-size:13px">${twdEq}</span>
       </div>`;
     }).join('');
     const divider = Object.keys(data.byCur).length > 0 ? `<div style="border-top:1px solid var(--divider);margin:6px 0"></div>` : '';
@@ -1891,15 +2119,86 @@ function renderSummary() {
       <div class="summary-card-title">${title} <span style="font-size:12px;color:var(--light)">(${count} 件)</span></div>
       ${curRows}
       ${divider}
-      <div class="summary-row"><span style="font-weight:500">合計折台幣</span><span class="summary-amount" style="color:var(--gold);font-size:20px">TWD ${data.twd.toLocaleString()}</span></div>
+      <div class="summary-row">
+        <span style="font-weight:500">合計</span>
+        <span class="summary-amount" style="color:var(--gold);font-size:20px">NT$${Math.round(data.twd).toLocaleString()}</span>
+      </div>
     </div>`;
   }
 
   const statusCount = {
-    buy: recs.filter(r => r.status === 'buy').length,
+    buy:    recs.filter(r => r.status === 'buy').length,
     bought: recs.filter(r => r.status === 'bought').length,
-    pass: recs.filter(r => r.status === 'pass').length,
+    pass:   recs.filter(r => r.status === 'pass').length,
   };
+
+  // 庫存壓力：業務 + 採購 > 需求
+  const invItems = [];
+  recs.forEach(r => {
+    if (r.type !== '業務') return;
+    const bought = parseFloat(r.qty) || 0;
+    const demand = parseFloat(r.demandQty) || 0;
+    if (bought <= 0 || demand <= 0 || bought <= demand) return;
+    const excess = bought - demand;
+    const useDiscount = r.hasDiscount && r.discountPrice && parseFloat(r.discountPrice) > 0;
+    const costPerUnit = useDiscount ? parseFloat(r.discountPrice) : (parseFloat(r.price) || 0);
+    const cur = r.currency || '';
+    const unitTWD = Math.round(costPerUnit * (rates[cur] || 1));
+    const totalTWD = unitTWD * excess;
+    invItems.push({ r, bought, demand, excess, costPerUnit, cur, unitTWD, totalTWD, useDiscount });
+  });
+
+  const invTotalTWD = invItems.reduce((s, i) => s + i.totalTWD, 0);
+  const invTotalQty = invItems.reduce((s, i) => s + i.excess, 0);
+
+  const invBlock = invItems.length > 0 ? `
+    <div class="summary-card" style="border-left:3px solid var(--accent)">
+      <div class="summary-card-title">庫存壓力
+        <span style="font-size:11px;color:var(--light)">（僅計算業務）</span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px">
+        <thead>
+          <tr style="color:var(--light);letter-spacing:1px;font-size:10px;border-bottom:1px solid var(--divider)">
+            <th style="text-align:left;padding:4px 0;font-weight:400">品項</th>
+            <th style="text-align:center;padding:4px 4px;font-weight:400">採購</th>
+            <th style="text-align:center;padding:4px 4px;font-weight:400">需求</th>
+            <th style="text-align:center;padding:4px 4px;font-weight:400">超出</th>
+            <th style="text-align:right;padding:4px 0;font-weight:400">金額/件</th>
+            <th style="text-align:right;padding:4px 0;font-weight:400">小計</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${invItems.map(i => `
+          <tr style="border-bottom:1px solid var(--divider)">
+            <td style="padding:6px 0;color:var(--dark)">
+              ${i.r.name || '未命名'}
+              ${i.r.status === 'bought' ? '<span style="font-size:9px;background:var(--status-bought);color:white;padding:1px 5px;border-radius:8px;margin-left:4px">已買</span>' : i.r.status === 'buy' ? '<span style="font-size:9px;background:var(--status-buy);color:white;padding:1px 5px;border-radius:8px;margin-left:4px">要買</span>' : ''}
+            </td>
+            <td style="text-align:center;padding:6px 4px;color:var(--mid)">${i.bought}</td>
+            <td style="text-align:center;padding:6px 4px;color:var(--mid)">${i.demand}</td>
+            <td style="text-align:center;padding:6px 4px">
+              <span style="background:var(--status-pass);color:white;font-size:10px;padding:1px 6px;border-radius:10px">${i.excess}</span>
+            </td>
+            <td style="text-align:right;padding:6px 0;color:var(--mid)">
+              ${fmtPrice(i.costPerUnit, i.cur)}${i.useDiscount ? ' <span style="font-size:10px;color:var(--gold)">折</span>' : ''}
+            </td>
+            <td style="text-align:right;padding:6px 0;font-weight:500;color:var(--accent)">NT$${i.totalTWD.toLocaleString()}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="summary-row">
+        <span style="font-weight:500">庫存總件數</span>
+        <span class="summary-amount" style="color:var(--accent)">${invTotalQty} 件</span>
+      </div>
+      <div class="summary-row" style="border-top:1px solid var(--divider);padding-top:8px;margin-top:4px">
+        <span style="font-weight:500">庫存總額</span>
+        <span class="summary-amount" style="color:var(--accent);font-size:20px">NT$${invTotalTWD.toLocaleString()}</span>
+      </div>
+    </div>` : `
+    <div class="summary-card" style="border-left:3px solid var(--status-buy)">
+      <div class="summary-card-title">庫存壓力</div>
+      <div class="summary-row"><span style="color:var(--status-buy)">✓ 無庫存壓力</span></div>
+    </div>`;
 
   document.getElementById('summary-content').innerHTML = `
     <div class="summary-card">
@@ -1908,9 +2207,19 @@ function renderSummary() {
       <div class="summary-row"><span>已買</span><span class="summary-amount" style="color:var(--status-bought)">${statusCount.bought} 件</span></div>
       <div class="summary-row"><span>放棄</span><span class="summary-amount" style="color:var(--status-pass)">${statusCount.pass} 件</span></div>
     </div>
+    ${invBlock}
     ${renderBlock('業務花費', bizTotal, bizRecs.length)}
     ${renderBlock('私人花費', personalTotal, personalRecs.length)}
-    ${renderBlock('合計', allTotal, recs.filter(r => r.price && r.currency).length)}
+    <div class="summary-card" style="border-top:2px solid var(--gold)">
+      <div class="summary-card-title">已買合計</div>
+      <div class="summary-row"><span>業務已買</span><span class="summary-amount">NT$${Math.round(bizBoughtTWD).toLocaleString()}</span></div>
+      <div class="summary-row"><span>私人已買</span><span class="summary-amount">NT$${Math.round(personalBoughtTWD).toLocaleString()}</span></div>
+      <div style="border-top:1px solid var(--divider);margin:6px 0"></div>
+      <div class="summary-row">
+        <span style="font-weight:500">總計</span>
+        <span class="summary-amount" style="color:var(--gold);font-size:22px">NT$${Math.round(grandTWD).toLocaleString()}</span>
+      </div>
+    </div>
   `;
 }
 
