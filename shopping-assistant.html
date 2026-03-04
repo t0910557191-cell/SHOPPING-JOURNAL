@@ -950,6 +950,22 @@
       </div>
     </div>
     <div class="settings-group">
+      <div class="settings-group-title">備份與還原（跨裝置同步用）</div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+        <div>
+          <div style="font-size:11px;color:var(--light);margin-bottom:6px;letter-spacing:0.5px">匯出備份檔（含照片與所有資料）</div>
+          <button class="btn-export" onclick="exportJSON()">⬇ 匯出 JSON 備份</button>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--light);margin-bottom:6px;letter-spacing:0.5px">匯入備份檔（會合併現有資料，不會覆蓋）</div>
+          <label class="btn-export" style="cursor:pointer;display:inline-block">
+            ⬆ 匯入 JSON 備份
+            <input type="file" accept=".json" onchange="importJSON(this)" style="display:none">
+          </label>
+        </div>
+      </div>
+    </div>
+    <div class="settings-group">
       <div class="settings-group-title">資料管理</div>
       <div style="padding:14px">
         <button class="btn-export" style="border-color:var(--status-pass);color:var(--status-pass)" onclick="clearAll()">清除全部資料</button>
@@ -2221,6 +2237,78 @@ function renderSummary() {
       </div>
     </div>
   `;
+}
+
+
+// ── JSON 備份匯出 ──
+async function exportJSON() {
+  // 從 IndexedDB 讀取含照片的完整資料
+  const fullRecords = await new Promise((resolve, reject) => {
+    const tx = db.transaction('records', 'readonly');
+    const store = tx.objectStore('records');
+    const req = store.getAll();
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+
+  const payload = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    rates: rates,
+    records: fullRecords,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `採購手帳備份_${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('備份已匯出');
+}
+
+// ── JSON 備份匯入（合併，不覆蓋已存在的 id）──
+async function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const text = await file.text();
+  let payload;
+  try {
+    payload = JSON.parse(text);
+  } catch {
+    toast('檔案格式錯誤'); return;
+  }
+  if (!payload.records || !Array.isArray(payload.records)) {
+    toast('無效的備份檔'); return;
+  }
+
+  const existingIds = new Set(records.map(r => r.id));
+  let added = 0;
+
+  for (const rec of payload.records) {
+    if (!rec.id) continue;
+    if (existingIds.has(rec.id)) continue; // 跳過已存在的
+    // 存照片（含 photo 欄位）
+    await dbPut('records', rec);
+    // 存 metadata（不含照片）
+    const recNoPhoto = { ...rec }; delete recNoPhoto.photo;
+    records.unshift(rec);
+    added++;
+  }
+
+  // 匯入匯率設定（若備份有）
+  if (payload.rates) {
+    Object.assign(rates, payload.rates);
+    await dbPut('settings', { key: 'rates', value: rates });
+    loadRatesUI();
+  }
+
+  renderRecords();
+  renderCatalog();
+  input.value = '';
+  toast(`已匯入 ${added} 筆新紀錄`);
 }
 
 // Batch currency
